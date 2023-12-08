@@ -1,4 +1,4 @@
-import {render} from '../render.js';
+import {render,RenderPosition} from '../render.js';
 
 import FiltersView from '../view/filters-view.js';
 import SortView from '../view/sort-view.js';
@@ -19,12 +19,12 @@ export default class TripPresenter {
   init() {
     const tripList = new TripListView();
 
-    render(new InfoView(),this.mainContainer,'тзь');
+    render(new InfoView(),this.mainContainer,RenderPosition.AFTERBEGIN);
     render(new FiltersView(), this.filterContainer);
     render(new SortView(),this.tripContainer);
     render(tripList,this.tripContainer);
 
-    render(new FormCeateView(),tripList.element,'afterbegin');
+    render(new FormCeateView(),tripList.element,RenderPosition.AFTERBEGIN);
 
     for(let i = 0; i < 3; i++){
       render(new PointView(),tripList.element);
