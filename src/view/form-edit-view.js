@@ -2,9 +2,7 @@ import {createElement} from '../render.js';
 import { typeNameNormalize } from '../utils.js';
 
 function createEditTemplate(point,offers,destination,destinationNames) {
-  console.log(point);
-  console.log(point);
-  console.log(point);
+
   const isOfferCheked = (offer) => point.offers.includes(offer.id) ? 'checked' : '';
 
   const createDestinationSection = (destinationObject) => {
