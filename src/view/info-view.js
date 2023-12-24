@@ -1,6 +1,9 @@
 import {createElement} from '../render.js';
 
-function createInfoTemplate() {
+function createInfoTemplate(points) {
+
+  const costValue = points.reduce((acc, item) => acc + item.price,0);
+
   return (
     `<section class="trip-main__trip-info  trip-info">
       <div class="trip-info__main">
@@ -10,15 +13,19 @@ function createInfoTemplate() {
       </div>
 
       <p class="trip-info__cost">
-        Total: &euro;&nbsp;<span class="trip-info__cost-value">1230</span>
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${costValue}</span>
       </p>
     </section>`
   );
 }
 
 export default class InfoView {
+  constructor ({ points }) {
+    this.points = points;
+  }
+
   getTemplate() {
-    return createInfoTemplate();
+    return createInfoTemplate(this.points);
   }
 
   getElement() {
