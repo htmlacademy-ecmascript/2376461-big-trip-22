@@ -150,7 +150,6 @@ function createEditTemplate(point,offers,destination,destinationNames) {
 
 export default class EditView extends AbstractView{
   #handleEditSubmit = null;
-  #assss = null;
 
   constructor ({ point, offers, destination, destitationNameList, onEditSubmit}) {
     super();
@@ -162,7 +161,6 @@ export default class EditView extends AbstractView{
 
     this.#handleEditSubmit = onEditSubmit;
 
-    this.#assss = this.element.querySelector('.event__save-btn');
     this.element.querySelector('.event__save-btn').addEventListener('submit',this.#editSubmitHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#rollUpClickHandler);
   }
