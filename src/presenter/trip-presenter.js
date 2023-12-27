@@ -1,4 +1,4 @@
-import {render,RenderPosition} from '../render.js';
+import {render,RenderPosition} from '../framework/render.js';
 import { BLANK_CREATE_FORM } from '../constants.js';
 
 import FiltersView from '../view/filters-view.js';
