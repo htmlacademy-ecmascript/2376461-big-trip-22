@@ -52,7 +52,7 @@ function createEditTemplate(point,offers,destination,destinationNames) {
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
           <span class="visually-hidden">Choose event type</span>
-          <img class="event__type-icon" width="17" height="17" src="img/icons/flight.png" alt="Event type icon">
+          <img class="event__type-icon" width="17" height="17" src="img/icons/${point.type}.png" alt="Event type icon">
         </label>
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -112,7 +112,7 @@ function createEditTemplate(point,offers,destination,destinationNames) {
         <label class="event__label  event__type-output" for="event-destination-1">
         ${typeNameNormalize(point.type)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${createDestinationOptionList(destinationNames)}
         </datalist>
@@ -149,16 +149,36 @@ function createEditTemplate(point,offers,destination,destinationNames) {
 }
 
 export default class EditView extends AbstractView{
+  #handleEditSubmit = null;
+  #assss = null;
 
-  constructor ({ point, offers, destination, destitationNameList}) {
+  constructor ({ point, offers, destination, destitationNameList, onEditSubmit}) {
     super();
+
     this.point = point;
     this.offers = offers;
     this.destination = destination;
     this.destitationNameList = destitationNameList;
+
+    this.#handleEditSubmit = onEditSubmit;
+
+    this.#assss = this.element.querySelector('.event__save-btn');
+    this.element.querySelector('.event__save-btn').addEventListener('submit',this.#editSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#rollUpClickHandler);
   }
 
   get template() {
     return createEditTemplate(this.point,this.offers,this.destination,this.destitationNameList);
   }
+
+  #editSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditSubmit();
+  };
+
+  #rollUpClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleEditSubmit();
+  };
+
 }
