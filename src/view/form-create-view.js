@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { typeNameNormalize } from '../utils.js';
 
 function createFormCeateTemplate(point,offers,destination,destinationNames) {
@@ -148,28 +148,16 @@ function createFormCeateTemplate(point,offers,destination,destinationNames) {
   );
 }
 
-export default class FormCeateView {
-
+export default class FormCeateView extends AbstractView{
   constructor ({ point, offers, destination, destitationNameList}) {
+    super();
     this.point = point;
     this.offers = offers;
     this.destination = destination;
     this.destitationNameList = destitationNameList;
   }
 
-  getTemplate() {
+  get template() {
     return createFormCeateTemplate(this.point,this.offers,this.destination,this.destitationNameList);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }

@@ -1,4 +1,4 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { typeNameNormalize } from '../utils.js';
 import dayjs from 'dayjs';
 
@@ -53,28 +53,17 @@ function createPointTemplate(pointData,offers,destination) {
   );
 }
 
-export default class PointView {
+export default class PointView extends AbstractView{
 
   constructor ({ point,offers, destination }) {
+    super();
     this.point = point;
     this.offers = offers;
     this.destination = destination;
   }
 
 
-  getTemplate() {
+  get template() {
     return createPointTemplate(this.point,this.offers,this.destination);
-  }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
   }
 }
