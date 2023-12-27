@@ -1,11 +1,9 @@
-import {render,RenderPosition} from '../framework/render.js';
-import { BLANK_CREATE_FORM } from '../constants.js';
+import {render, replace} from '../framework/render.js';
 
 import FiltersView from '../view/filters-view.js';
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
 import PointView from '../view/point-view.js';
-import FormCeateView from '../view/form-create-view.js';
 import EditView from '../view/form-edit-view.js';
 
 export default class TripPresenter {
@@ -24,27 +22,48 @@ export default class TripPresenter {
     render(new SortView(),this.tripContainer);
     render(tripList,this.tripContainer);
 
-    render(new FormCeateView({
-      point:BLANK_CREATE_FORM.point,
-      offers:BLANK_CREATE_FORM.offers.offers,
-      destination:BLANK_CREATE_FORM.destination,
-      destitationNameList:BLANK_CREATE_FORM.destinationsName}),
-    tripList.element,RenderPosition.AFTERBEGIN);
+    for(let i = 0; i < this.pointsData.length; i++){
+      this.#renderWayPoint(this.pointsData[i],tripList.element);
+    }
+  }
 
-    render(new EditView({
-      point:this.pointsData[1],
-      offers:this.pointsModel.getOffersByType(this.pointsData[1].type),
-      destination:this.pointsModel.getDestinationById(this.pointsData[1].destination),
-      destitationNameList:this.pointsModel.getDestinationNameList()}),
-    tripList.element);
+  #renderWayPoint (wayPoint,wayPointsContainer){
 
-    for(let i = 2; i < this.pointsData.length; i++){
-      render(new PointView({
-        point:this.pointsData[i],
-        offers:this.pointsModel.getOffersByType(this.pointsData[i].type),
-        destination:this.pointsModel.getDestinationById(this.pointsData[i].destination)}),
-      tripList.element);
+    const escKeyDownHandler = (evt) => {
+      if(evt.key === 'Escape'){
+        evt.preventDefault();
+        replaceEditFormToPoint();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
+
+    const pointComponent = new PointView({
+      point:wayPoint,
+      offers:this.pointsModel.getOffersByType(wayPoint.type),
+      destination:this.pointsModel.getDestinationById(wayPoint.destination),
+      onPointClick: () => {
+        replacePointToEditForm();
+        document.addEventListener('keydown', escKeyDownHandler);
+      }});
+
+    const editPointComponent = new EditView({
+      point:wayPoint,
+      offers:this.pointsModel.getOffersByType(wayPoint.type),
+      destination:this.pointsModel.getDestinationById(wayPoint.destination),
+      destitationNameList:this.pointsModel.getDestinationNameList(),
+      onEditSubmit: () => {
+        replaceEditFormToPoint();
+        document.removeEventListener('keydown',escKeyDownHandler);
+      }});
+
+    function replacePointToEditForm() {
+      replace(editPointComponent,pointComponent);
+    }
+    function replaceEditFormToPoint() {
+      replace(pointComponent,editPointComponent);
     }
 
+    render(pointComponent,wayPointsContainer);
   }
+
 }
