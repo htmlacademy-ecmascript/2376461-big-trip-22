@@ -150,14 +150,18 @@ function createEditTemplate(point,offers,destination,destinationNames) {
 
 export default class EditView extends AbstractView{
   #handleEditSubmit = null;
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #destitationNameList = null;
 
   constructor ({ point, offers, destination, destitationNameList, onEditSubmit}) {
     super();
 
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
-    this.destitationNameList = destitationNameList;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#destitationNameList = destitationNameList;
 
     this.#handleEditSubmit = onEditSubmit;
 
@@ -166,7 +170,7 @@ export default class EditView extends AbstractView{
   }
 
   get template() {
-    return createEditTemplate(this.point,this.offers,this.destination,this.destitationNameList);
+    return createEditTemplate(this.#point,this.#offers,this.#destination,this.#destitationNameList);
   }
 
   #editSubmitHandler = (evt) => {

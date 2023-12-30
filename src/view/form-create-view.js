@@ -149,15 +149,20 @@ function createFormCeateTemplate(point,offers,destination,destinationNames) {
 }
 
 export default class FormCeateView extends AbstractView{
+  #point = null;
+  #offers = null;
+  #destination = null;
+  #destitationNameList = null;
+
   constructor ({ point, offers, destination, destitationNameList}) {
     super();
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
-    this.destitationNameList = destitationNameList;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = destination;
+    this.#destitationNameList = destitationNameList;
   }
 
   get template() {
-    return createFormCeateTemplate(this.point,this.offers,this.destination,this.destitationNameList);
+    return createFormCeateTemplate(this.#point,this.#offers,this.#destination,this.#destitationNameList);
   }
 }
