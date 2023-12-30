@@ -165,7 +165,7 @@ export default class EditView extends AbstractView{
 
     this.#handleEditSubmit = onEditSubmit;
 
-    this.element.querySelector('.event__save-btn').addEventListener('submit',this.#editSubmitHandler);
+    this.element.querySelector('.event__save-btn').addEventListener('click',this.#editSubmitHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#rollUpClickHandler);
   }
 
