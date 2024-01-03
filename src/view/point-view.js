@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize } from '../utils.js';
+import { typeNameNormalize } from '../utils/common.js';
 import dayjs from 'dayjs';
 
 function createPointTemplate(pointData,offers,destination) {

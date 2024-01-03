@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize } from '../utils.js';
+import { typeNameNormalize } from '../utils/common.js';
 
 function createFormCeateTemplate(point,offers,destination,destinationNames) {
 

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize } from '../utils.js';
+import { typeNameNormalize } from '../utils/common.js';
 
 function createEditTemplate(point,offers,destination,destinationNames) {
 

@@ -1,6 +1,6 @@
 import { getRandomPoint,getOffersInType,getDestinationsMock } from '../mock/mock-points.js';
 
-const POINT_COUNT = 4;
+const POINT_COUNT = 3;
 
 export default class PointsModel {
 
