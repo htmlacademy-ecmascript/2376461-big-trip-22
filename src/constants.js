@@ -43,4 +43,18 @@ const BLANK_CREATE_FORM = {
     'Home']
 };
 
-export { BLANK_CREATE_FORM };
+const FiltersType = {
+  everything: 'everything',
+  future: 'future',
+  present: 'present',
+  past: 'past'
+};
+
+const CLEAR_BOARD_TEXT = {
+  everything: 'Click New Event to create your first point',
+  future: 'There are no future events now',
+  present: 'There are no present events now',
+  past: 'There are no past events now'
+};
+
+export { BLANK_CREATE_FORM, FiltersType, CLEAR_BOARD_TEXT };
