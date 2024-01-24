@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize } from '../utils/common.js';
+import { typeNameNormalize, getAllKeyValue, getItemById } from '../utils/common.js';
 
 function createEditTemplate(point,offers,destination,destinationNames) {
 
@@ -155,18 +155,19 @@ export default class EditView extends AbstractView{
   #destination = null;
   #destitationNameList = null;
 
-  constructor ({ point, offers, destination, destitationNameList, onEditSubmit}) {
+  constructor ({ point, offers, destinations, onEditSubmit}) {
     super();
 
     this.#point = point;
     this.#offers = offers;
-    this.#destination = destination;
-    this.#destitationNameList = destitationNameList;
+    this.#destination = getItemById(this.#point.destination,destinations);
+    this.#destitationNameList = getAllKeyValue('name',destinations);
 
     this.#handleEditSubmit = onEditSubmit;
 
     this.element.querySelector('.event__save-btn').addEventListener('click',this.#editSubmitHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#rollUpClickHandler);
+
   }
 
   get template() {
