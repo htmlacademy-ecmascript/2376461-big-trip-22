@@ -57,4 +57,9 @@ const CLEAR_BOARD_TEXT = {
   past: 'There are no past events now'
 };
 
-export { BLANK_CREATE_FORM, FiltersType, CLEAR_BOARD_TEXT };
+const Mode = {
+  DEFAULT: 'default',
+  EDITING: 'editing',
+};
+
+export { BLANK_CREATE_FORM, FiltersType, CLEAR_BOARD_TEXT , Mode };

@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize } from '../utils/common.js';
+import { typeNameNormalize, getItemById } from '../utils/common.js';
 import dayjs from 'dayjs';
 
 function createPointTemplate(pointData,offers,destination) {
@@ -54,28 +54,40 @@ function createPointTemplate(pointData,offers,destination) {
 }
 
 export default class PointView extends AbstractView{
-  #handlePointClick = null;
+  #point = null;
+  #offers = null;
+  #destination = null;
 
-  constructor ({ point,offers, destination, onPointClick }) {
+  #onEditClick = () => {};
+  #onFavoriteClick = () => {};
+
+  constructor ({ point,offers, destinations, onEditClick, onFavoriteClick}) {
     super();
 
-    this.point = point;
-    this.offers = offers;
-    this.destination = destination;
+    this.#point = point;
+    this.#offers = offers;
+    this.#destination = getItemById(this.#point.destination,destinations);
 
-    this.#handlePointClick = onPointClick;
+    this.#onEditClick = onEditClick;
+    this.#onFavoriteClick = onFavoriteClick;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#pointClickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#editClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
 
 
   get template() {
-    return createPointTemplate(this.point,this.offers,this.destination);
+    return createPointTemplate(this.#point,this.#offers,this.#destination);
   }
 
-  #pointClickHandler = (evt) => {
+  #editClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handlePointClick();
+    this.#onEditClick();
+  };
+
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#onFavoriteClick();
   };
 
 }

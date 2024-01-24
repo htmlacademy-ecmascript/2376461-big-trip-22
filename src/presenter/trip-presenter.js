@@ -1,22 +1,25 @@
-import {render, replace} from '../framework/render.js';
+import { render } from '../framework/render.js';
 import { FiltersType } from '../constants.js';
 import FiltersView from '../view/filters-view.js';
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
-import PointView from '../view/point-view.js';
-import EditView from '../view/form-edit-view.js';
 import ListEmpty from '../view/list-empty.js';
 import { filter } from '../utils/filter.js';
+import { updateItem } from '../utils/common.js';
+import PointPresenter from './point-presenter.js';
+
 export default class TripPresenter {
   #filterContainer = null;
   #tripContainer = null;
   #pointsModel = null;
   #pointsData = null;
+  #destinations = null;
   #filter = null;
 
   #listEmpty = null;
   #tripList = null;
 
+  #pointPresenters = new Map();
   #pointsForRender = [];
 
   constructor({filterContainer,tripContainer,pointsModel}) {
@@ -27,6 +30,7 @@ export default class TripPresenter {
 
   init() {
     this.#pointsData = [...this.#pointsModel.getPoints()];
+    this.#destinations = this.#pointsModel.getDestinations();
 
     this.#tripList = new TripListView();
 
@@ -76,47 +80,30 @@ export default class TripPresenter {
     for(let i = 0; i < this.#pointsForRender.length; i++){
       this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
     }
-
+    console.log(this.#pointPresenters);
   }
 
   //отрисовка точки
-  #renderWayPoint (wayPoint,wayPointsContainer){
+  #renderWayPoint (wayPoint , wayPointsContainer){
+    const poitPresenter = new PointPresenter({
+      pointContainer: wayPointsContainer,
+      offers: this.#pointsModel.getOffersByType(wayPoint.type),
+      destinations: this.#destinations,
+      onModeChange: this.#modeChangeHandle,
+      onPointChange: this.#pointChangeHandle
+    });
 
-    const escKeyDownHandler = (evt) => {
-      if(evt.key === 'Escape'){
-        evt.preventDefault();
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    };
-
-    const pointComponent = new PointView({
-      point:wayPoint,
-      offers:this.#pointsModel.getOffersByType(wayPoint.type),
-      destination:this.#pointsModel.getDestinationById(wayPoint.destination),
-      onPointClick: () => {
-        replacePointToEditForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }});
-
-    const editPointComponent = new EditView({
-      point:wayPoint,
-      offers:this.#pointsModel.getOffersByType(wayPoint.type),
-      destination:this.#pointsModel.getDestinationById(wayPoint.destination),
-      destitationNameList:this.#pointsModel.getDestinationNameList(),
-      onEditSubmit: () => {
-        replaceEditFormToPoint();
-        document.removeEventListener('keydown',escKeyDownHandler);
-      }});
-
-    function replacePointToEditForm() {
-      replace(editPointComponent,pointComponent);
-    }
-    function replaceEditFormToPoint() {
-      replace(pointComponent,editPointComponent);
-    }
-
-    render(pointComponent,wayPointsContainer);
+    poitPresenter.init(wayPoint);
+    this.#pointPresenters.set(wayPoint.id,poitPresenter);
   }
 
+  #pointChangeHandle = (updatedPoint) => {
+    this.#pointsForRender = updateItem(this.#pointsForRender, updatedPoint);
+    this.#pointsData = updateItem(this.#pointsData, updatedPoint);
+    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
+  };
+
+  #modeChangeHandle = () => {
+    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.reset());
+  };
 }
