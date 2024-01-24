@@ -2,6 +2,7 @@ import { getRandomArrayElement } from '../utils/common.js';
 
 const wayPoints = [
   {
+    id: 'w-1',
     type: 'bus',
     destination: 'dest-id-1',
     timeDateStart: new Date('2023-12-14T00:00:00.000Z'),//день/месяц/год часы:минуты  flatpicker: d/m/Y h:i
@@ -11,6 +12,7 @@ const wayPoints = [
     offers: [0],
   },
   {
+    id: 'w-2',
     type: 'taxi',
     destination: 'dest-id-2',
     timeDateStart: new Date('2023-12-14T00:00:00.000Z'),
@@ -20,6 +22,7 @@ const wayPoints = [
     offers: [1,0],
   },
   {
+    id: 'w-3',
     type: 'drive',
     destination: 'dest-id-3',
     timeDateStart: new Date('2023-12-14T00:00:00.000Z'),
@@ -29,6 +32,7 @@ const wayPoints = [
     offers: [0,1],
   },
   {
+    id: 'w-4',
     type: 'ship',
     destination: 'dest-id-4',
     timeDateStart: new Date('2023-12-14T00:00:00.000Z'),
@@ -38,6 +42,7 @@ const wayPoints = [
     offers: [1],
   },
   {
+    id: 'w-5',
     type: 'restaurant',
     destination: 'dest-id-5',
     timeDateStart: new Date('2023-12-14T00:00:00.000Z'),
