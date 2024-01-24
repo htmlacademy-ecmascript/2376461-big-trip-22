@@ -14,18 +14,8 @@ export default class PointsModel {
     return getDestinationsMock();
   }
 
-  getDestinationById(id){
-    const allDestinations = this.getDestinations();
-    return allDestinations.find((item) => item.id === id);
-  }
-
   getOffersByType(type){
     this.offer = getOffersInType().filter((item) =>item.type === type);
     return this.offer[0].offers;
-  }
-
-  getDestinationNameList(){
-    const destinations = this.getDestinations();
-    return destinations.map((item) => item.name);
   }
 }
