@@ -62,4 +62,12 @@ const Mode = {
   EDITING: 'editing',
 };
 
-export { BLANK_CREATE_FORM, FiltersType, CLEAR_BOARD_TEXT , Mode };
+const SortType = {
+  DAY: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFERS: 'offers'
+};
+
+export { BLANK_CREATE_FORM, FiltersType, CLEAR_BOARD_TEXT , Mode, SortType };

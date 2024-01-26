@@ -2,12 +2,20 @@ import { getRandomPoint,getOffersInType,getDestinationsMock } from '../mock/mock
 
 const POINT_COUNT = 5;
 
-export default class PointsModel {
 
-  points = Array.from({length: POINT_COUNT}, getRandomPoint);
+export default class PointsModel {
+  #points = [];
 
   getPoints(){
-    return this.points;
+    //забиваю массив точками, но только уникальными
+    while(this.#points.length < POINT_COUNT){
+      const point = getRandomPoint();
+      if(!this.#points.includes(point)){
+        this.#points.push(point);
+      }
+    }
+
+    return this.#points;
   }
 
   getDestinations(){
