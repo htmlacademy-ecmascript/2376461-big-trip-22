@@ -3,15 +3,15 @@ import {render,RenderPosition} from '../framework/render.js';
 import InfoView from '../view/info-view.js';
 
 export default class InfoPresenter {
+  #tripMainElement = null;
 
-  constructor({mainContainer,pointsModel}) {
-    this.mainContainer = mainContainer;
-    this.pointsModel = pointsModel;
+  constructor() {
   }
 
-  init() {
-    this.pointsData = [...this.pointsModel.getPoints()];
+  init(data) {
+    this.pointsData = data;
+    this.#tripMainElement = document.querySelector('.trip-main');
 
-    render(new InfoView({ points:this.pointsData }),this.mainContainer,RenderPosition.AFTERBEGIN);
+    render(new InfoView({ points:this.pointsData }),this.#tripMainElement,RenderPosition.AFTERBEGIN);
   }
 }
