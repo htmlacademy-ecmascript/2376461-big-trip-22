@@ -1,6 +1,7 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import { typeNameNormalize, getItemById } from '../utils/common.js';
 import dayjs from 'dayjs';
+import { differenceTime } from '../utils/date.js';
 
 function createPointTemplate(pointData,offers,destination) {
   const { type,price,timeDateStart,timeDateEnd,isFavorite} = pointData;
@@ -30,7 +31,7 @@ function createPointTemplate(pointData,offers,destination) {
           &mdash;
           <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(timeDateEnd).format('h:mm')}</time>
         </p>
-        <p class="event__duration">30M</p>
+        <p class="event__duration">${differenceTime(timeDateEnd,timeDateStart)}</p>
       </div>
       <p class="event__price">
         &euro;&nbsp;<span class="event__price-value">${price}</span>
