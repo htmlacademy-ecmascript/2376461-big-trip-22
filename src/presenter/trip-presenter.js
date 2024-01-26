@@ -7,6 +7,9 @@ import ListEmpty from '../view/list-empty.js';
 import { filter } from '../utils/filter.js';
 import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
+import InfoPresenter from './info-presenter.js';
+import { SortType } from '../constants.js';
+import { sortDate, sortPrice, sortTime } from '../utils/date.js';
 
 export default class TripPresenter {
   #filterContainer = null;
@@ -14,10 +17,15 @@ export default class TripPresenter {
   #pointsModel = null;
   #pointsData = null;
   #destinations = null;
-  #filter = null;
+  #filter = FiltersType.everything;
 
   #listEmpty = null;
   #tripList = null;
+
+  #sortComponent = null;
+  #currentSortType = SortType.DAY;
+
+  #infoPresenter = null;
 
   #pointPresenters = new Map();
   #pointsForRender = [];
@@ -36,12 +44,16 @@ export default class TripPresenter {
 
     this.#filter = FiltersType.everything;
 
+    this.#infoPresenter = new InfoPresenter();//Info wiev
+    this.#infoPresenter.init(this.#pointsData);
+
     //рендер вью фильтров и прокидывание события клика
     render(new FiltersView({points: this.#pointsData,
       onFilterClick: (evt) => {
         evt.preventDefault();
         this.#filter = evt.target.textContent.toLowerCase();
         this.#filterPointsData();
+
         if(this.#pointsForRender.length === 0){
           return;
         }
@@ -51,8 +63,13 @@ export default class TripPresenter {
         this.#renderAPP();
       }}), this.#filterContainer);
 
-    render(new SortView(),this.#tripContainer);
+    this.#renderSortWiev();
+
     render(this.#tripList,this.#tripContainer);
+
+    this.#pointsForRender.sort(sortDate);//сортирую по дате начала событий
+    this.#pointsData.sort(sortDate);//сортирую по дате начала событий
+
     this.#renderAPP();
   }
 
@@ -68,6 +85,24 @@ export default class TripPresenter {
     this.#pointsForRender = filter[this.#filter](this.#pointsData);//отфильтрованные точки
   }
 
+  //обновляет массив поинтов согласно сортировке
+  #sortPointsData(){
+    switch(this.#currentSortType){
+      case SortType.DAY:
+        this.#pointsForRender.sort(sortDate);
+        break;
+      case SortType.PRICE:
+        this.#pointsForRender.sort(sortPrice);
+        break;
+      case SortType.TIME:
+        this.#pointsForRender.sort(sortTime);
+        break;
+      default:
+        this.#pointsForRender.sort(sortDate);
+        break;
+    }
+  }
+
   //основная функция рендер для отрисовки поинтов в борде
   #renderAPP (){
 
@@ -76,11 +111,11 @@ export default class TripPresenter {
       return;
     }
     this.#filterPointsData();
+    this.#sortPointsData();
 
     for(let i = 0; i < this.#pointsForRender.length; i++){
       this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
     }
-    console.log(this.#pointPresenters);
   }
 
   //отрисовка точки
@@ -103,7 +138,26 @@ export default class TripPresenter {
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
+  //Реакция на смену Mode
   #modeChangeHandle = () => {
     this.#pointPresenters.forEach((pointPresenter) => pointPresenter.reset());
   };
+
+  #renderSortWiev(){
+    this.#sortComponent = new SortView({onSortTypeChange: this.#handleSortTypeChange});
+
+    render(this.#sortComponent,this.#tripContainer);
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if(sortType === this.#currentSortType){
+      return;
+    }
+
+    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.destroy());
+    this.#currentSortType = sortType;
+
+    this.#renderAPP();
+  };
+
 }
