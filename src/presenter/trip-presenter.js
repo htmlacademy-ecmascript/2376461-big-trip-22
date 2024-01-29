@@ -1,5 +1,5 @@
-import { render } from '../framework/render.js';
-import { FiltersType } from '../constants.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
+import { FiltersType, BLANK_CREATE_POINT } from '../constants.js';
 import FiltersView from '../view/filters-view.js';
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
@@ -10,6 +10,8 @@ import PointPresenter from './point-presenter.js';
 import InfoPresenter from './info-presenter.js';
 import { SortType } from '../constants.js';
 import { sortDate, sortPrice, sortTime } from '../utils/date.js';
+import NewEventButton from '../view/new-event-button.js';
+import FormCeateView from '../view/form-create-view.js';
 
 export default class TripPresenter {
   #filterContainer = null;
@@ -18,6 +20,10 @@ export default class TripPresenter {
   #pointsData = null;
   #destinations = null;
   #filter = FiltersType.everything;
+  #newEventButtonComponent = null;
+  #mainElement = null;
+
+  #formCreateEvent = null;
 
   #listEmpty = null;
   #tripList = null;
@@ -30,10 +36,11 @@ export default class TripPresenter {
   #pointPresenters = new Map();
   #pointsForRender = [];
 
-  constructor({filterContainer,tripContainer,pointsModel}) {
+  constructor({filterContainer,tripContainer,pointsModel,mainElement}) {
     this.#filterContainer = filterContainer;
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
+    this.#mainElement = mainElement;
   }
 
   init() {
@@ -70,6 +77,7 @@ export default class TripPresenter {
     this.#pointsForRender.sort(sortDate);//сортирую по дате начала событий
     this.#pointsData.sort(sortDate);//сортирую по дате начала событий
 
+    this.#renderNewEventButton();
     this.#renderAPP();
   }
 
@@ -110,6 +118,7 @@ export default class TripPresenter {
       this.#renderEmpty();
       return;
     }
+
     this.#filterPointsData();
     this.#sortPointsData();
 
@@ -122,7 +131,7 @@ export default class TripPresenter {
   #renderWayPoint (wayPoint , wayPointsContainer){
     const poitPresenter = new PointPresenter({
       pointContainer: wayPointsContainer,
-      offers: this.#pointsModel.getOffersByType(wayPoint.type),
+      offers: this.#pointsModel.getOffers(),
       destinations: this.#destinations,
       onModeChange: this.#modeChangeHandle,
       onPointChange: this.#pointChangeHandle
@@ -138,6 +147,33 @@ export default class TripPresenter {
     this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
   };
 
+  //отобразить кнопку добавить новую точку маршрута
+  #renderNewEventButton() {
+    if (this.#newEventButtonComponent === null) {
+      this.#newEventButtonComponent = new NewEventButton({onNewEventButtonClick: this.#onNewEventButtonClick});
+      render(this.#newEventButtonComponent, this.#mainElement);
+    }
+  }
+
+  //событие клик по кнопке создать новую точку маршрута
+  #onNewEventButtonClick = () => {
+    if(this.#formCreateEvent !== null){
+      return;
+    }
+
+    this.#formCreateEvent = new FormCeateView({
+      point: BLANK_CREATE_POINT,
+      offers: this.#pointsModel.getOffers(),
+      destinations: this.#destinations,
+      onTypeChange: this.#onTypeChange,
+      onDestinationChange: this.#onDestinationChange,
+      onResetClick: this.#onResetNewEventClick,
+      onSaveClick: this.#onSaveNewEventClick
+    });
+
+    render(this.#formCreateEvent,this.#tripList.element,RenderPosition.AFTERBEGIN);
+  };
+
   //Реакция на смену Mode
   #modeChangeHandle = () => {
     this.#pointPresenters.forEach((pointPresenter) => pointPresenter.reset());
@@ -145,7 +181,6 @@ export default class TripPresenter {
 
   #renderSortWiev(){
     this.#sortComponent = new SortView({onSortTypeChange: this.#handleSortTypeChange});
-
     render(this.#sortComponent,this.#tripContainer);
   }
 
@@ -160,4 +195,23 @@ export default class TripPresenter {
     this.#renderAPP();
   };
 
+  //событие изменить тип точки маршрута
+  #onTypeChange = (newType) => {
+    this.#formCreateEvent.setNewType(newType);
+  };
+
+  //событие изменить пункт назначения точки маршрута
+  #onDestinationChange = (newDestination) => {
+    this.#formCreateEvent.setNewDestination(newDestination);
+  };
+
+  #onResetNewEventClick = () => {
+    remove(this.#formCreateEvent);
+    this.#formCreateEvent = null;
+  };
+
+  #onSaveNewEventClick = () => {
+    remove(this.#formCreateEvent);//временно
+    this.#formCreateEvent = null;
+  };
 }
