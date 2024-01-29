@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { typeNameNormalize, getAllKeyValue, getItemById, getOffersByType } from '../utils/common.js';
-import { POINTS_TYPE } from '../constants.js';
+import { POINTS_TYPE, CONFIG_DATE_PICKER } from '../constants.js';
+
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createFormCeateTemplate(point,offers,destinations,destinationNames) {
 
@@ -139,6 +142,9 @@ export default class FormCeateView extends AbstractStatefulView{
   #destinations = null;
   #destitationNameList = null;
 
+  #datePickerFrom = null;
+  #datePickerTo = null;
+
   #onTypeChange = () => {};
   #onDestinationChange = () => {};
   #onResetClick = () => {};
@@ -193,6 +199,9 @@ export default class FormCeateView extends AbstractStatefulView{
     this.element.querySelector('.event__type-group').addEventListener('change', this.#pointTypeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+
+    this.#setDatePickerFrom();
+    this.#setDatePickerTo();
   }
 
   #pointTypeChangeHandler = (evt) => {
@@ -228,4 +237,44 @@ export default class FormCeateView extends AbstractStatefulView{
     this.#onResetClick();
   };
 
+
+  //установить дату и время начала точки маршрута
+  #setDatePickerFrom() {
+    this.#datePickerFrom = flatpickr(
+      this.element.querySelector('.event__input--time[name="event-start-time"]'),
+      {
+        ...CONFIG_DATE_PICKER,
+        defaultDate: this._state.timeDateEnd,//this._state.dateFrom
+        maxDate: this._state.timeDateStart,//this._state.dateTo
+        onChange: this.#dateFromChangeHandler,
+      },
+    );
+  }
+
+  //событие изменение даты и время начала точки маршрута
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate.toISOString(),
+    });
+  };
+
+  //установить дату и время окончания точки маршрута
+  #setDatePickerTo() {
+    this.#datePickerTo = flatpickr(
+      this.element.querySelector('.event__input--time[name="event-end-time"]'),
+      {
+        ...CONFIG_DATE_PICKER,
+        defaultDate: this._state.timeDateEnd,
+        minDate: this._state.timeDateStart,
+        onChange: this.#dateToChangeHandler,
+      },
+    );
+  }
+
+  //событие изменение даты и время окончания точки маршрута
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate.toISOString(),
+    });
+  };
 }
