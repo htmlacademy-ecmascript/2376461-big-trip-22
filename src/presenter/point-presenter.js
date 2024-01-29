@@ -1,5 +1,6 @@
 import { Mode } from '../constants.js';
 import {remove, render, replace} from '../framework/render.js';
+import { getOffersByType } from '../utils/common.js';
 
 import PointView from '../view/point-view';
 import EditView from '../view/form-edit-view.js';
@@ -26,7 +27,6 @@ export default class PointPresenter {
 
     this.#pointChangeHandle = onPointChange;
     this.#modeChangeHandle = onModeChange;
-
   }
 
   init(point) {
@@ -46,6 +46,9 @@ export default class PointPresenter {
       point:this.#point,
       offers:this.#offers,
       destinations:this.#destinations,
+      onTypeChange: this.#onTypeChange,
+      onDestinationChange: this.#onDestinationChange,
+      onCloseEdit: this.#onCloseEditForm,
       onEditSubmit: () => {
         this.#replaceFormToPoint();
         document.removeEventListener('keydown',this.#escKeyDownHandler);
@@ -110,6 +113,22 @@ export default class PointPresenter {
   #onEditClick = () => {
     this.#replacePointToForm();
     document.addEventListener('keydown', this.#escKeyDownHandler);
+  };
+
+  //событие изменить тип точки маршрута
+  #onTypeChange = (newType) => {
+    this.#editPointComponent.setNewType(newType);
+  };
+
+  //событие изменить пункт назначения точки маршрута
+  #onDestinationChange = (newDestination) => {
+    this.#editPointComponent.setNewDestination(newDestination);
+  };
+
+  #onCloseEditForm = () => {
+    this.#editPointComponent.resetState();
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown',this.#escKeyDownHandler);
   };
 
 }
