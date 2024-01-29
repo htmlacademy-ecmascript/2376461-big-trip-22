@@ -5,6 +5,7 @@ const POINT_COUNT = 5;
 
 export default class PointsModel {
   #points = [];
+  #offers = getOffersInType();
 
   getPoints(){
     //забиваю массив точками, но только уникальными
@@ -22,8 +23,7 @@ export default class PointsModel {
     return getDestinationsMock();
   }
 
-  getOffersByType(type){
-    this.offer = getOffersInType().filter((item) =>item.type === type);
-    return this.offer[0].offers;
+  getOffers(){
+    return this.#offers;
   }
 }
