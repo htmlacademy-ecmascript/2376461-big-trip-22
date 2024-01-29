@@ -1,3 +1,4 @@
+
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
 }
@@ -25,4 +26,12 @@ function updateItem(items, update) {
   return items.map((item) => item.id === update.id ? update : item);
 }
 
-export { getRandomArrayElement, typeNameNormalize, getAllKeyValue, getItemById, updateItem };
+const getOffersByType = (offers,type) =>{
+  const offer = offers.filter((item) =>item.type === type);
+  if(offer.length <= 0){
+    return [];
+  }
+  return offer[0].offers;
+};
+
+export { getRandomArrayElement, typeNameNormalize, getAllKeyValue, getItemById, updateItem, getOffersByType };
