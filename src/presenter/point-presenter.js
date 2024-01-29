@@ -1,6 +1,5 @@
 import { Mode } from '../constants.js';
 import {remove, render, replace} from '../framework/render.js';
-import { getOffersByType } from '../utils/common.js';
 
 import PointView from '../view/point-view';
 import EditView from '../view/form-edit-view.js';
