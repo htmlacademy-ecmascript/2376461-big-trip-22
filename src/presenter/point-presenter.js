@@ -48,6 +48,7 @@ export default class PointPresenter {
       destinations:this.#destinations,
       onTypeChange: this.#onTypeChange,
       onDestinationChange: this.#onDestinationChange,
+      onCloseEdit: this.#onCloseEditForm,
       onEditSubmit: () => {
         this.#replaceFormToPoint();
         document.removeEventListener('keydown',this.#escKeyDownHandler);
@@ -122,6 +123,12 @@ export default class PointPresenter {
   //событие изменить пункт назначения точки маршрута
   #onDestinationChange = (newDestination) => {
     this.#editPointComponent.setNewDestination(newDestination);
+  };
+
+  #onCloseEditForm = () => {
+    this.#editPointComponent.resetState();
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown',this.#escKeyDownHandler);
   };
 
 }
