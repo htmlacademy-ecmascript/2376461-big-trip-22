@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { typeNameNormalize, getItemById } from '../utils/common.js';
+import { typeNameNormalize, getItemById,getOffersByType } from '../utils/common.js';
 import dayjs from 'dayjs';
 import { differenceTime } from '../utils/date.js';
 
@@ -78,7 +78,7 @@ export default class PointView extends AbstractView{
 
 
   get template() {
-    return createPointTemplate(this.#point,this.#offers,this.#destination);
+    return createPointTemplate(this.#point,getOffersByType(this.#offers,this.#point.type),this.#destination);
   }
 
   #editClickHandler = (evt) => {
