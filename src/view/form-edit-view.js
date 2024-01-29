@@ -129,8 +129,9 @@ export default class EditView extends AbstractStatefulView{
 
   #onTypeChange = () => {};
   #onDestinationChange = () => {};
+  #handleCloseEdit = () => {};
 
-  constructor ({ point, offers, destinations, onTypeChange, onDestinationChange , onEditSubmit}) {
+  constructor ({ point, offers, destinations, onTypeChange, onDestinationChange , onEditSubmit, onCloseEdit}) {
     super();
     this._setState(point);
 
@@ -143,7 +144,7 @@ export default class EditView extends AbstractStatefulView{
     this.#destitationNameList = getAllKeyValue('name',destinations);
 
     this.#handleEditSubmit = onEditSubmit;
-
+    this.#handleCloseEdit = onCloseEdit;
 
     this._restoreHandlers();
   }
@@ -194,7 +195,7 @@ export default class EditView extends AbstractStatefulView{
 
   #rollUpClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditSubmit();
+    this.#handleCloseEdit();
   };
 
   #buttonDeleteClickHandler = () => {
