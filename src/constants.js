@@ -56,4 +56,26 @@ const SortType = {
   OFFERS: 'offers'
 };
 
-export { BLANK_CREATE_POINT, POINTS_TYPE, FiltersType, CLEAR_BOARD_TEXT , Mode, SortType, CONFIG_DATE_PICKER };
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+export {
+  BLANK_CREATE_POINT,
+  POINTS_TYPE,
+  FiltersType,
+  CLEAR_BOARD_TEXT ,
+  Mode,
+  SortType,
+  CONFIG_DATE_PICKER,
+  UserAction,
+  UpdateType };
