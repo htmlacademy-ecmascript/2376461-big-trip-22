@@ -1,4 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { UserAction, UpdateType } from '../constants.js';
 import { typeNameNormalize, getItemById,getOffersByType } from '../utils/common.js';
 import dayjs from 'dayjs';
 import { differenceTime } from '../utils/date.js';
@@ -27,9 +28,9 @@ function createPointTemplate(pointData,offers,destination) {
       <h3 class="event__title">${typeNameNormalize(type)} ${destination.name}</h3>
       <div class="event__schedule">
         <p class="event__time">
-          <time class="event__start-time" datetime="2019-03-18T10:30">${dayjs(timeDateStart).format('h:mm')}</time>
+          <time class="event__start-time" datetime="${dayjs(timeDateStart).format('h:mm')}">${dayjs(timeDateStart).format('h:mm')}</time>
           &mdash;
-          <time class="event__end-time" datetime="2019-03-18T11:00">${dayjs(timeDateEnd).format('h:mm')}</time>
+          <time class="event__end-time" datetime="${dayjs(timeDateStart).format('h:mm')}">${dayjs(timeDateEnd).format('h:mm')}</time>
         </p>
         <p class="event__duration">${differenceTime(timeDateEnd,timeDateStart)}</p>
       </div>
@@ -88,7 +89,7 @@ export default class PointView extends AbstractView{
 
   #favoriteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#onFavoriteClick();
+    this.#onFavoriteClick(UserAction.UPDATE_EVENT, UpdateType.PATCH);
   };
 
 }
