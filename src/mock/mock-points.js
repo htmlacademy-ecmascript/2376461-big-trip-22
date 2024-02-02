@@ -1,6 +1,8 @@
 import { getRandomArrayElement } from '../utils/common.js';
 import { nanoid } from 'nanoid';
 
+const POINT_COUNT = 5;
+
 const wayPoints = [
   {
     id: nanoid(),
@@ -265,4 +267,17 @@ function getOffersInType(){
 function getDestinationsMock(){
   return destinations;
 }
-export { getRandomPoint, getOffersInType, getDestinationsMock };
+
+function getPointsMock(){
+  const points = [];
+  //забиваю массив точками, но только уникальными
+  while(points.length < POINT_COUNT){
+    const point = getRandomPoint();
+    if(!points.includes(point)){
+      points.push(point);
+    }
+  }
+
+  return points;
+}
+export { getRandomPoint, getOffersInType, getDestinationsMock,getPointsMock };
