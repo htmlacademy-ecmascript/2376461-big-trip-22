@@ -14,9 +14,9 @@ const BLANK_CREATE_POINT = {
   id: '0',
   type: 'taxi',
   destination: '',
-  timeDateStart: new Date().toString(),//день/месяц/год часы:минуты  flatpicker: d/m/Y h:i
-  timeDateEnd: new Date().toString(),
-  price: 0,
+  timeDateStart: '',//день/месяц/год часы:минуты  flatpicker: d/m/Y h:i
+  timeDateEnd: '',
+  price: '',
   isFavorite: false,
   offers: [],
 };
@@ -71,6 +71,7 @@ const UpdateType = {
 
 export {
   BLANK_CREATE_POINT,
+  DateFormat,
   POINTS_TYPE,
   FiltersType,
   CLEAR_BOARD_TEXT ,
