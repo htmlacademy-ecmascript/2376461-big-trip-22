@@ -1,42 +1,48 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { FiltersType } from '../constants.js';
 import { typeNameNormalize } from '../utils/common.js';
-import { filter } from '../utils/filter.js';
 
-function createFiltersTemplate(points) {
+function createFiltersTemplate(filters) {
 
-  const renderFilters = (filters) => {
-    const allFilters = Object.values(filters);
-    return allFilters.map((item) => {
-      const isDisabled = filter[item](points).length === 0 ? 'disabled' : '';
-      return `
+  const renderFilters = (filtersArray) => filtersArray.map((item) => {
+    const isDisabled = item.count === 0 ? 'disabled' : '';
+    const isChecked = item.isChecked === true ? 'checked' : '';
+
+    return `
               <div class="trip-filters__filter">
-                <input id="filter-${item}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${item}" ${isDisabled}>
-                <label class="trip-filters__filter-label" for="filter-${item}">${typeNameNormalize(item)}</label>
+                <input id="filter-${item.name}" class="trip-filters__filter-input  visually-hidden" type="radio" name="trip-filter" value="${item.name}" ${isChecked} ${isDisabled}>
+                <label class="trip-filters__filter-label" for="filter-${item.name}">${typeNameNormalize(item.name)}</label>
               </div>`;
-    }).join('');
-  };
+  }).join('');
 
   return (
     `<form class="trip-filters" action="#" method="get">
-    ${renderFilters(FiltersType)}
+    ${renderFilters(filters)}
         <button class="visually-hidden" type="submit">Accept filter</button>
       </form>`
   );
 }
 
 export default class FiltersView extends AbstractView{
-  #handleFilterClick = null;
-  #points = null;
+  #filters = null;
+  #onFilterChange = () => {};
 
-  constructor ({points, onFilterClick}) {
+  constructor ({filters, onFilterChange}) {
     super();
-    this.#handleFilterClick = onFilterClick;
-    this.#points = points;
-    this.element.parentElement.querySelectorAll('.trip-filters__filter-label').forEach((item) => item.addEventListener('click',this.#handleFilterClick));
+    this.#filters = filters;
+    this.#onFilterChange = onFilterChange;
+    this.element.addEventListener('change', this.#filterChangeHandler);
   }
 
   get template() {
-    return createFiltersTemplate(this.#points);
+    return createFiltersTemplate(this.#filters);
   }
+
+  //событие изменение фильтра
+  #filterChangeHandler = (evt) => {
+    evt.preventDefault();
+
+    if (evt.target.tagName === 'INPUT') {
+      this.#onFilterChange(evt.target.value);
+    }
+  };
 }
