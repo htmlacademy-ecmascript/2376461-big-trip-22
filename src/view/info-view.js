@@ -1,8 +1,24 @@
 import AbstractView from '../framework/view/abstract-view.js';
+import { getOffersByType } from '../utils/common.js';
 
-function createInfoTemplate(points) {
+function calculateOffersPrice (offersArray,pointsArray){
+  let price = 0;
 
-  const costValue = points.reduce((acc, item) => acc + item.price,0);
+  pointsArray.forEach((point) => {
+    const offersPoint = getOffersByType(offersArray,point.type);
+    const offersSelected = offersPoint.filter((item) => point.offers.includes(item.id));
+    offersSelected.forEach((item) => {
+      price += Number(item.price);
+    });
+  });
+
+  return price;
+}
+
+function createInfoTemplate(points,offers) {
+
+  const pointsPriceValue = points.reduce((acc, item) => acc + item.price,0);
+  const offersPriceValue = calculateOffersPrice(offers,points);
 
   return (
     `<section class="trip-main__trip-info  trip-info">
@@ -13,7 +29,7 @@ function createInfoTemplate(points) {
       </div>
 
       <p class="trip-info__cost">
-        Total: &euro;&nbsp;<span class="trip-info__cost-value">${costValue}</span>
+        Total: &euro;&nbsp;<span class="trip-info__cost-value">${pointsPriceValue + offersPriceValue}</span>
       </p>
     </section>`
   );
@@ -21,13 +37,15 @@ function createInfoTemplate(points) {
 
 export default class InfoView extends AbstractView{
   #points = null;
+  #offers = null;
 
-  constructor ({ points }) {
+  constructor ({ points, offers }) {
     super();
     this.#points = points;
+    this.#offers = offers;
   }
 
   get template() {
-    return createInfoTemplate(this.#points);
+    return createInfoTemplate(this.#points,this.#offers);
   }
 }
