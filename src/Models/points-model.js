@@ -34,13 +34,7 @@ export default class PointsModel extends Observable {
   //получить данные о точке маршрута по её идентификатору
   getPointDataById(id) {
     const point = this.#points.find((item) => item.id === id);
-    const destination = this.#destinations.find((item) => item.id === point.destination);
-    const offers = this.#offers.find((item) => item.type === point.type.toLocaleLowerCase());
-    return {
-      point: point ?? {},
-      destination: destination ?? {},
-      offers: offers.offers ?? {}
-    };
+    return point;
   }
 
   //обновить точку маршрута
