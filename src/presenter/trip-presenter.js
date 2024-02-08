@@ -4,7 +4,6 @@ import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
 import ListEmpty from '../view/list-empty.js';
 import { filter } from '../utils/filter.js';
-import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
 import { SortType } from '../constants.js';
 import { sortDate, sortPrice, sortTime } from '../utils/date.js';
@@ -48,7 +47,7 @@ export default class TripPresenter {
   init() {
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-
+    console.log(this.#pointsModel);
     this.#tripList = new TripListView();
 
     this.#filter = FiltersType.everything;
@@ -253,7 +252,7 @@ export default class TripPresenter {
   #handleModelChange = (updateType, id) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointPresenters.get(id).init(this.#pointsData.getContentById(id));
+        this.#pointPresenters.get(id).init(this.#pointsModel.getPointDataById(id));
         break;
       case UpdateType.MINOR:
         this.#clearWayPoints();

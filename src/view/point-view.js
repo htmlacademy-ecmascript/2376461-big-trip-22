@@ -7,7 +7,6 @@ import { differenceTime } from '../utils/date.js';
 function createPointTemplate(pointData,offers,destination) {
   const { type,price,timeDateStart,timeDateEnd,isFavorite} = pointData;
 
-
   const favoriteCheck = isFavorite ? 'event__favorite-btn--active' : ''; // true or false
 
   const offersSelected = (point,allOffers) => allOffers.filter((item) => point.offers.includes(item.id));
