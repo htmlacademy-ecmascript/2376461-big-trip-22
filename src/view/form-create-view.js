@@ -24,6 +24,9 @@ function createFormCeateTemplate(point,offers,destinations,destinationNames) {
     if(destinationObject === null || destinationObject === undefined){
       return '';
     }
+    if(destinationObject.description === '' && destinationObject.pictures.length === 0){
+      return '';
+    }
 
     const showPhotos = () => destinationObject.pictures.map((item) => `<img class="event__photo" src="${item.src}" alt="${item.description}">`).join('');
 
@@ -39,15 +42,15 @@ function createFormCeateTemplate(point,offers,destinations,destinationNames) {
   </section>`);
   };
 
-  const createOffers = (offersArr) => offersArr.map((item) => `<div class="event__available-offers">
+  const createOffers = (offersArr) => offersArr.map((item) => `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${item.id}" type="checkbox" name="event-offer-luggage" ${isOfferCheked(item)}>
-      <label class="event__offer-label" for="event-offer-luggage-${item.id}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${item.id}"  value="${item.id}" type="checkbox" name="event-offer-${item.id}" ${isOfferCheked(item)}>
+      <label class="event__offer-label" for="event-offer-${item.id}">
         <span class="event__offer-title">${item.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${item.price}</span>
       </label>
-    </div>`).join('');
+      </div>`).join('');
 
   const createOffersSection = (offersArr) => {
     if(offersArr.length < 1){
@@ -200,10 +203,25 @@ export default class FormCeateView extends AbstractStatefulView{
     this.element.querySelector('.event__type-group').addEventListener('change', this.#pointTypeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#offersChangeHandler);
 
     this.#setDatePickerFrom();
     this.#setDatePickerTo();
   }
+
+  #offersChangeHandler = (event) => {
+
+    event.preventDefault();
+    const offer = event.target?.value;
+    const isSelected = this._state.offers.indexOf(offer) >= 0;
+    const offers = isSelected
+      ? this._state.offers.filter((offerItem) => offerItem !== offer)
+      : [...this._state.offers, offer];
+
+    this.updateElement({
+      offers,
+    });
+  };
 
   #pointTypeChangeHandler = (evt) => {
     evt.preventDefault();

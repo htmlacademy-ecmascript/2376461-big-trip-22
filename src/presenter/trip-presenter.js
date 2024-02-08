@@ -1,5 +1,6 @@
 import { remove, render,replace, RenderPosition } from '../framework/render.js';
 import { FiltersType, BLANK_CREATE_POINT, UpdateType, UserAction } from '../constants.js';
+import LoadingView from '../view/loading-view.js';
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
 import ListEmpty from '../view/list-empty.js';
@@ -31,6 +32,9 @@ export default class TripPresenter {
 
   #infoView = null;
 
+  #isLoading = true;
+  #loadingTripComponent = new LoadingView();
+
   #pointPresenters = new Map();
   #pointsForRender = [];
 
@@ -45,15 +49,16 @@ export default class TripPresenter {
   }
 
   init() {
+
+
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-    console.log(this.#pointsModel);
+
     this.#tripList = new TripListView();
 
     this.#filter = FiltersType.everything;
 
     this.#renderInfoWiev();
-    this.#renderSortWiev();
 
     render(this.#tripList,this.#tripContainer);
 
@@ -67,10 +72,21 @@ export default class TripPresenter {
   //основная функция рендер для отрисовки поинтов в борде
   #renderAPP (){
 
+    if (this.#isLoading) {
+      render(this.#loadingTripComponent, this.#tripContainer);
+      return;
+    }
+
+    this.#pointsData = [...this.#pointsModel.wayPoints];
+    this.#destinations = this.#pointsModel.destinations;
+
     if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
       this.#renderEmpty();
       return;
     }
+
+    this.#renderInfoWiev();
+    this.#renderSortWiev();
 
     this.#filterPointsData(this.#filterModel.filter);
     this.#sortPointsData();
@@ -169,13 +185,11 @@ export default class TripPresenter {
   }
 
   #renderSortWiev(){
-
     const previousSortComponent = this.#sortComponent;
-
-    this.#sortComponent = new SortView({onSortTypeChange: this.#handleSortTypeChange});
+    this.#sortComponent = new SortView({currentSortType: this.#currentSortType, onSortTypeChange: this.#handleSortTypeChange});
 
     if(previousSortComponent === null){
-      render(this.#sortComponent,this.#tripContainer);
+      render(this.#sortComponent,this.#tripContainer,RenderPosition.AFTERBEGIN);
     }else{
       replace(this.#sortComponent, previousSortComponent);
       remove(previousSortComponent);
@@ -201,8 +215,8 @@ export default class TripPresenter {
       return;
     }
 
-    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.destroy());
     this.#currentSortType = sortType;
+    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.destroy());
 
     this.#renderAPP();
   };
@@ -228,16 +242,28 @@ export default class TripPresenter {
   };
 
   //событие добавление/изменение/удаление точки маршрута
-  #onDataChange = (actionType, updateType, newPoint) => {
+  #onDataChange = async (actionType, updateType, newPoint) => {
     switch (actionType) {
       case UserAction.ADD_EVENT:
-        this.#pointsModel.addPoint(updateType, newPoint);
+        try {
+          await this.#pointsModel.addEvent(updateType, newPoint);
+        } catch (error) {
+          console.log(error);
+        }
         break;
       case UserAction.UPDATE_EVENT:
-        this.#pointsModel.updatePoint(updateType, newPoint);
+        try {
+          await this.#pointsModel.updateEvent(updateType, newPoint);
+        } catch (error) {
+          console.log(error);
+        }
         break;
       case UserAction.DELETE_EVENT:
-        this.#pointsModel.deletePoint(updateType, newPoint);
+        try {
+          await this.#pointsModel.deleteEvent(updateType, newPoint);
+        } catch (error) {
+          console.log(error);
+        }
         break;
     }
   };
@@ -246,13 +272,15 @@ export default class TripPresenter {
   #clearWayPoints() {
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
+
+    remove(this.#loadingTripComponent);
   }
 
   //обновить представления списка точек маршрута в случае изменения модели данных
-  #handleModelChange = (updateType, id) => {
+  #handleModelChange = (updateType, data) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        this.#pointPresenters.get(id).init(this.#pointsModel.getPointDataById(id));
+        this.#pointPresenters.get(data.id).init(this.#pointsModel.getPointDataById(data.id));
         break;
       case UpdateType.MINOR:
         this.#clearWayPoints();
@@ -262,6 +290,18 @@ export default class TripPresenter {
         this.#clearWayPoints();
         this.#currentSortType = SortType.DAY;
         this.init();
+        break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingTripComponent);
+        this.#renderAPP();
+        this.#newEventButtonComponent.updateElement({disabled: false});
+        break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        this.#newEventButtonComponent.updateElement({disabled: true});
+        //this.#renderFailedState();
+        this.#clearWayPoints();
         break;
     }
 

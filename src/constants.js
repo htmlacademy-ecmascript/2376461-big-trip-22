@@ -67,6 +67,14 @@ const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  ERROR: 'ERROR',
+};
+
+const ApiMethod = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
 };
 
 export {
@@ -79,4 +87,5 @@ export {
   SortType,
   CONFIG_DATE_PICKER,
   UserAction,
-  UpdateType };
+  UpdateType,
+  ApiMethod };

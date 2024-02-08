@@ -1,5 +1,5 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINTS_TYPE, CONFIG_DATE_PICKER, DateFormat } from '../constants.js';
+import { POINTS_TYPE, CONFIG_DATE_PICKER, DateFormat, UserAction, UpdateType } from '../constants.js';
 import { typeNameNormalize, getAllKeyValue, getItemById, getOffersByType } from '../utils/common.js';
 
 import { convertDate } from '../utils/date.js';
@@ -14,6 +14,12 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
   const isOfferCheked = (offer) => point.offers.includes(offer.id) ? 'checked' : '';
 
   const createDestinationSection = (destinationObject) => {
+    if(destinationObject === null || destinationObject === undefined){
+      return '';
+    }
+    if(destinationObject.description === '' && destinationObject.pictures.length === 0){
+      return '';
+    }
     const showPhotos = () => destinationObject.pictures.map((item) => `<img class="event__photo" src="${item.src}" alt="${item.description}">`).join('');
 
     return (`<section class="event__section  event__section--destination">
@@ -28,15 +34,15 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
   </section>`);
   };
 
-  const createOffers = (offersArr) => offersArr.map((item) => `<div class="event__available-offers">
+  const createOffers = (offersArr) => offersArr.map((item) => `
     <div class="event__offer-selector">
-      <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-${item.id}" type="checkbox" name="event-offer-luggage" ${isOfferCheked(item)}>
-      <label class="event__offer-label" for="event-offer-luggage-${item.id}">
+      <input class="event__offer-checkbox  visually-hidden" id="event-offer-${item.id}"  value="${item.id}" type="checkbox" name="event-offer-${item.id}" ${isOfferCheked(item)}>
+      <label class="event__offer-label" for="event-offer-${item.id}">
         <span class="event__offer-title">${item.title}</span>
         &plus;&euro;&nbsp;
         <span class="event__offer-price">${item.price}</span>
       </label>
-    </div>`).join('');
+      </div>`).join('');
 
   const createOffersSection = (offersArr) => {
     if(offersArr.length < 1){
@@ -47,7 +53,9 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
     <section class="event__section  event__section--offers">
       <h3 class="event__section-title  event__section-title--offers">Offers</h3>
       <div class="event__available-offers">
+
       ${createOffers(offersArr)}
+
       </div>
       </section>`);
   };
@@ -196,14 +204,29 @@ export default class EditView extends AbstractStatefulView{
     this.element.querySelector('.event__type-group').addEventListener('change', this.#pointTypeChangeHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#destinationChangeHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+    this.element.querySelector('.event__available-offers')?.addEventListener('change', this.#offersChangeHandler);
 
     this.#setDatePickerFrom();
     this.#setDatePickerTo();
   }
 
+  #offersChangeHandler = (event) => {
+
+    event.preventDefault();
+    const offer = event.target?.value;
+    const isSelected = this._state.offers.indexOf(offer) >= 0;
+    const offers = isSelected
+      ? this._state.offers.filter((offerItem) => offerItem !== offer)
+      : [...this._state.offers, offer];
+
+    this.updateElement({
+      offers,
+    });
+  };
+
   #editSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditSubmit();
+    this.#handleEditSubmit(UserAction.UPDATE_EVENT, UpdateType.PATCH,this._state);
   };
 
   #rollUpClickHandler = (evt) => {
@@ -236,8 +259,10 @@ export default class EditView extends AbstractStatefulView{
     }
   };
 
-  #priceChangeHandler = () => {
+  #priceChangeHandler = (evt) => {
+    evt.preventDefault();
 
+    this._state.price = evt.target.value.replace(/\D/g, '');
   };
 
 

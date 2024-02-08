@@ -1,3 +1,5 @@
+import TripApiService from './trip-api-service.js';
+
 import TripPresenter from './presenter/trip-presenter.js';
 import FilterPresenter from './presenter/filter-presenter.js';
 
@@ -8,7 +10,10 @@ const filtersElement = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const tripMainElement = document.querySelector('.trip-main');
 
-const pointsModel = new PointsModel();
+const AUTHORIZATION = 'Basic minecraft0is0reallife';
+const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
+
+const pointsModel = new PointsModel({ tripApiService: new TripApiService(END_POINT, AUTHORIZATION) });
 const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter({container:filtersElement,filterModel: filterModel, pointsModel:pointsModel});
@@ -19,5 +24,7 @@ const tripPresenter = new TripPresenter({
   pointsModel: pointsModel,
   mainElement:tripMainElement});
 
+
+pointsModel.init();
 filterPresenter.init();
 tripPresenter.init();
