@@ -47,7 +47,7 @@ export default class TripPresenter {
   init() {
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-    console.log(this.#pointsModel);
+
     this.#tripList = new TripListView();
 
     this.#filter = FiltersType.everything;
