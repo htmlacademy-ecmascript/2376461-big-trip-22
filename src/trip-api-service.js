@@ -22,6 +22,17 @@ export default class TripApiService extends ApiService {
     }).then(ApiService.parseResponse);
   }
 
+  async updateEvent(event) {
+    const response = await this._load({
+      url: `points/${event.id}`,
+      method: ApiMethod.PUT,
+      body: JSON.stringify(this.#adaptToServer(event)),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    });
+
+    return await ApiService.parseResponse(response);
+  }
+
   async addEvent(event) {
     const response = await this._load({
       url: 'points',
@@ -43,8 +54,8 @@ export default class TripApiService extends ApiService {
   #adaptToServer(event) {
     const adaptedEvent = {
       ...event,
-      'date_from': event.timeDateStart.toISOString(),
-      'date_to': event.timeDateEnd.toISOString(),
+      'date_from': event.timeDateStart,
+      'date_to': event.timeDateEnd,
       'base_price': parseInt(event['price'], 10),
       'is_favorite': event['isFavorite'],
     };
