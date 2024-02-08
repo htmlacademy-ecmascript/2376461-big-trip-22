@@ -69,6 +69,13 @@ const UpdateType = {
   INIT: 'INIT',
 };
 
+const ApiMethod = {
+  GET: 'GET',
+  PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE'
+};
+
 export {
   BLANK_CREATE_POINT,
   DateFormat,
@@ -79,4 +86,5 @@ export {
   SortType,
   CONFIG_DATE_PICKER,
   UserAction,
-  UpdateType };
+  UpdateType,
+  ApiMethod };
