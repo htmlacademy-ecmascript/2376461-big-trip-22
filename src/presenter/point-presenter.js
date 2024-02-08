@@ -49,10 +49,8 @@ export default class PointPresenter {
       onDestinationChange: this.#onDestinationChange,
       onCloseEdit: this.#onCloseEditForm,
       onDelete: this.#onButtonDeleteClick,
-      onEditSubmit: () => {
-        this.#replaceFormToPoint();
-        document.removeEventListener('keydown',this.#escKeyDownHandler);
-      }});
+      onEditSubmit: this.#onEditSubmit,
+    });
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#pointContainer);
@@ -111,6 +109,12 @@ export default class PointPresenter {
     const newPoint = {...this.#point};
     newPoint.isFavorite = !this.#point.isFavorite;
     this.#onDataChange(actionType, updateType, newPoint);
+  };
+
+  #onEditSubmit = (actionType, updateType, point) => {
+    this.#onDataChange(actionType, updateType, point);
+    this.#replaceFormToPoint();
+    document.removeEventListener('keydown',this.#escKeyDownHandler);
   };
 
   #onEditClick = () => {
