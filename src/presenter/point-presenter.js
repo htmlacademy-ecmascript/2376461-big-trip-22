@@ -1,4 +1,4 @@
-import { Mode } from '../constants.js';
+import { Mode, UserAction, UpdateType } from '../constants.js';
 import {remove, render, replace} from '../framework/render.js';
 
 import PointView from '../view/point-view';
@@ -14,17 +14,17 @@ export default class PointPresenter {
   #pointComponent = null;
   #editPointComponent = null;
 
-  #pointChangeHandle = () => {};
+  #onDataChange = () => {};
   #modeChangeHandle = () => {};
 
   #mode = Mode.DEFAULT;
 
-  constructor({pointContainer, offers, destinations, onPointChange, onModeChange}) {
+  constructor({pointContainer, offers, destinations, onDataChange, onModeChange}) {
     this.#pointContainer = pointContainer;
     this.#offers = offers;
     this.#destinations = destinations;
 
-    this.#pointChangeHandle = onPointChange;
+    this.#onDataChange = onDataChange;
     this.#modeChangeHandle = onModeChange;
   }
 
@@ -48,6 +48,7 @@ export default class PointPresenter {
       onTypeChange: this.#onTypeChange,
       onDestinationChange: this.#onDestinationChange,
       onCloseEdit: this.#onCloseEditForm,
+      onDelete: this.#onButtonDeleteClick,
       onEditSubmit: () => {
         this.#replaceFormToPoint();
         document.removeEventListener('keydown',this.#escKeyDownHandler);
@@ -105,8 +106,11 @@ export default class PointPresenter {
     remove(this.#editPointComponent);
   }
 
-  #onFavoriteClick = () => {
-    this.#pointChangeHandle({...this.#point, isFavorite: !this.#point.isFavorite});
+  //событие клик по кнопке избранное
+  #onFavoriteClick = (actionType, updateType) => {
+    const newPoint = {...this.#point};
+    newPoint.isFavorite = !this.#point.isFavorite;
+    this.#onDataChange(actionType, updateType, newPoint);
   };
 
   #onEditClick = () => {
@@ -130,4 +134,9 @@ export default class PointPresenter {
     document.removeEventListener('keydown',this.#escKeyDownHandler);
   };
 
+  //событие клик по кнопке удаления формы редактирования точки маршрута
+  #onButtonDeleteClick = (point) => {
+    this.#replaceFormToPoint();
+    this.#onDataChange(UserAction.DELETE_EVENT, UpdateType.MINOR, point);
+  };
 }

@@ -1,6 +1,8 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import { POINTS_TYPE, CONFIG_DATE_PICKER } from '../constants.js';
+import { POINTS_TYPE, CONFIG_DATE_PICKER, DateFormat } from '../constants.js';
 import { typeNameNormalize, getAllKeyValue, getItemById, getOffersByType } from '../utils/common.js';
+
+import { convertDate } from '../utils/date.js';
 
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -95,10 +97,10 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
 
       <div class="event__field-group  event__field-group--time">
         <label class="visually-hidden" for="event-start-time-1">From</label>
-        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="18/03/19 12:25">
+        <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${convertDate(point.timeDateStart,DateFormat.DAY_MONTH_YEAR_TIME)}">
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
-        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="18/03/19 13:35">
+        <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${convertDate(point.timeDateStart,DateFormat.DAY_MONTH_YEAR_TIME)}">
       </div>
 
       <div class="event__field-group  event__field-group--price">
@@ -106,7 +108,7 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
           <span class="visually-hidden">Price</span>
           &euro;
         </label>
-        <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.price}">
+        <input type="number" class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.price}">
       </div>
 
       <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
@@ -136,13 +138,15 @@ export default class EditView extends AbstractStatefulView{
   #onTypeChange = () => {};
   #onDestinationChange = () => {};
   #handleCloseEdit = () => {};
+  #handleDeleteClick = () => {};
 
-  constructor ({ point, offers, destinations, onTypeChange, onDestinationChange , onEditSubmit, onCloseEdit}) {
+  constructor ({ point, offers, destinations, onTypeChange, onDestinationChange , onEditSubmit, onDelete, onCloseEdit}) {
     super();
     this._setState(point);
 
     this.#onTypeChange = onTypeChange;
     this.#onDestinationChange = onDestinationChange;
+    this.#handleDeleteClick = onDelete;
 
     this.#point = point;
     this.#offers = offers;
@@ -207,8 +211,9 @@ export default class EditView extends AbstractStatefulView{
     this.#handleCloseEdit();
   };
 
-  #buttonDeleteClickHandler = () => {
-
+  #buttonDeleteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(this._state);
   };
 
   #pointTypeChangeHandler = (evt) => {

@@ -31,6 +31,11 @@ const isPast = (date) => date && dayjs().isAfter(date);
  */
 const isPresent = (dateFrom, dateTo) => dayjs().isSameOrAfter(dateFrom) && dayjs().isSameOrBefore(dateTo);
 
+//преобразование даты
+function convertDate(date, format) {
+  return date ? dayjs(date).format(format) : '';
+}
+
 function differenceTime(toTime, fromTime) {
   const diffMin = dayjs.utc(toTime).diff(fromTime, 'minute');
   const diffHour = dayjs.utc(toTime).diff(fromTime, 'hour');
@@ -52,4 +57,4 @@ const sortPrice = (a, b) => b.price - a.price;
 //sort по времени
 const sortTime = (a,b) => differenceMinutes(b.timeDateEnd,b.timeDateStart) - differenceMinutes(a.timeDateEnd,a.timeDateStart);
 
-export { isFuture, isPast, isPresent, differenceTime, sortDate, sortPrice, sortTime };
+export { isFuture, isPast, isPresent, differenceTime, sortDate, sortPrice, sortTime, convertDate };

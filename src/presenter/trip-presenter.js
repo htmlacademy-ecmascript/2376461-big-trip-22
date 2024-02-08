@@ -1,20 +1,18 @@
-import { remove, render, RenderPosition } from '../framework/render.js';
-import { FiltersType, BLANK_CREATE_POINT } from '../constants.js';
-import FiltersView from '../view/filters-view.js';
+import { remove, render,replace, RenderPosition } from '../framework/render.js';
+import { FiltersType, BLANK_CREATE_POINT, UpdateType, UserAction } from '../constants.js';
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/trip-list-view.js';
 import ListEmpty from '../view/list-empty.js';
 import { filter } from '../utils/filter.js';
-import { updateItem } from '../utils/common.js';
 import PointPresenter from './point-presenter.js';
-import InfoPresenter from './info-presenter.js';
 import { SortType } from '../constants.js';
 import { sortDate, sortPrice, sortTime } from '../utils/date.js';
 import NewEventButton from '../view/new-event-button.js';
 import FormCeateView from '../view/form-create-view.js';
+import InfoView from '../view/info-view.js';
 
 export default class TripPresenter {
-  #filterContainer = null;
+  #filterModel = null;
   #tripContainer = null;
   #pointsModel = null;
   #pointsData = null;
@@ -31,45 +29,30 @@ export default class TripPresenter {
   #sortComponent = null;
   #currentSortType = SortType.DAY;
 
-  #infoPresenter = null;
+  #infoView = null;
 
   #pointPresenters = new Map();
   #pointsForRender = [];
 
-  constructor({filterContainer,tripContainer,pointsModel,mainElement}) {
-    this.#filterContainer = filterContainer;
+  constructor({filterModel,tripContainer,pointsModel,mainElement}) {
+    this.#filterModel = filterModel;
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
     this.#mainElement = mainElement;
+
+    this.#pointsModel.addObserver(this.#handleModelChange);
+    this.#filterModel.addObserver(this.#handleModelChange);
   }
 
   init() {
-    this.#pointsData = [...this.#pointsModel.getPoints()];
-    this.#destinations = this.#pointsModel.getDestinations();
-
+    this.#pointsData = [...this.#pointsModel.wayPoints];
+    this.#destinations = this.#pointsModel.destinations;
+    console.log(this.#pointsModel);
     this.#tripList = new TripListView();
 
     this.#filter = FiltersType.everything;
 
-    this.#infoPresenter = new InfoPresenter();//Info wiev
-    this.#infoPresenter.init(this.#pointsData);
-
-    //рендер вью фильтров и прокидывание события клика
-    render(new FiltersView({points: this.#pointsData,
-      onFilterClick: (evt) => {
-        evt.preventDefault();
-        this.#filter = evt.target.textContent.toLowerCase();
-        this.#filterPointsData();
-
-        if(this.#pointsForRender.length === 0){
-          return;
-        }
-        [...this.#tripList.element.children].forEach((item) => {
-          item.remove();
-        });
-        this.#renderAPP();
-      }}), this.#filterContainer);
-
+    this.#renderInfoWiev();
     this.#renderSortWiev();
 
     render(this.#tripList,this.#tripContainer);
@@ -81,6 +64,22 @@ export default class TripPresenter {
     this.#renderAPP();
   }
 
+  //основная функция рендер для отрисовки поинтов в борде
+  #renderAPP (){
+
+    if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
+      this.#renderEmpty();
+      return;
+    }
+
+    this.#filterPointsData(this.#filterModel.filter);
+    this.#sortPointsData();
+
+    for(let i = 0; i < this.#pointsForRender.length; i++){
+      this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
+    }
+  }
+
   //отрисовывает заглушку, когда точки пусты
   #renderEmpty(){
     this.#listEmpty = new ListEmpty();
@@ -89,8 +88,8 @@ export default class TripPresenter {
   }
 
   //обновляет массив поинтов для рендера сортируя по указанному фильтру
-  #filterPointsData(){
-    this.#pointsForRender = filter[this.#filter](this.#pointsData);//отфильтрованные точки
+  #filterPointsData(filterPoints){
+    this.#pointsForRender = filter[filterPoints]([...this.#pointsModel.wayPoints]);//отфильтрованные точки
   }
 
   //обновляет массив поинтов согласно сортировке
@@ -111,41 +110,19 @@ export default class TripPresenter {
     }
   }
 
-  //основная функция рендер для отрисовки поинтов в борде
-  #renderAPP (){
-
-    if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
-      this.#renderEmpty();
-      return;
-    }
-
-    this.#filterPointsData();
-    this.#sortPointsData();
-
-    for(let i = 0; i < this.#pointsForRender.length; i++){
-      this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
-    }
-  }
-
   //отрисовка точки
   #renderWayPoint (wayPoint , wayPointsContainer){
     const poitPresenter = new PointPresenter({
       pointContainer: wayPointsContainer,
-      offers: this.#pointsModel.getOffers(),
+      offers: this.#pointsModel.offers,
       destinations: this.#destinations,
       onModeChange: this.#modeChangeHandle,
-      onPointChange: this.#pointChangeHandle
+      onDataChange: this.#onDataChange
     });
 
     poitPresenter.init(wayPoint);
     this.#pointPresenters.set(wayPoint.id,poitPresenter);
   }
-
-  #pointChangeHandle = (updatedPoint) => {
-    this.#pointsForRender = updateItem(this.#pointsForRender, updatedPoint);
-    this.#pointsData = updateItem(this.#pointsData, updatedPoint);
-    this.#pointPresenters.get(updatedPoint.id).init(updatedPoint);
-  };
 
   //отобразить кнопку добавить новую точку маршрута
   #renderNewEventButton() {
@@ -163,25 +140,60 @@ export default class TripPresenter {
 
     this.#formCreateEvent = new FormCeateView({
       point: BLANK_CREATE_POINT,
-      offers: this.#pointsModel.getOffers(),
+      offers: this.#pointsModel.offers,
       destinations: this.#destinations,
       onTypeChange: this.#onTypeChange,
       onDestinationChange: this.#onDestinationChange,
       onResetClick: this.#onResetNewEventClick,
       onSaveClick: this.#onSaveNewEventClick
     });
-
+    this.#resetAllPresenters();
     render(this.#formCreateEvent,this.#tripList.element,RenderPosition.AFTERBEGIN);
   };
 
   //Реакция на смену Mode
   #modeChangeHandle = () => {
-    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.reset());
+    this.#removeFormCreate();
+    this.#resetAllPresenters();
   };
 
+  //удалить форму создания
+  #removeFormCreate(){
+    remove(this.#formCreateEvent);
+    this.#formCreateEvent = null;
+  }
+
+  //сбросить все презентеры
+  #resetAllPresenters(){
+    this.#pointPresenters.forEach((pointPresenter) => pointPresenter.reset());
+  }
+
   #renderSortWiev(){
+
+    const previousSortComponent = this.#sortComponent;
+
     this.#sortComponent = new SortView({onSortTypeChange: this.#handleSortTypeChange});
-    render(this.#sortComponent,this.#tripContainer);
+
+    if(previousSortComponent === null){
+      render(this.#sortComponent,this.#tripContainer);
+    }else{
+      replace(this.#sortComponent, previousSortComponent);
+      remove(previousSortComponent);
+    }
+  }
+
+  #renderInfoWiev(){
+    const previousInfoComponent = this.#infoView;
+
+    this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers});//Info wiev
+
+    if (previousInfoComponent === null) {
+      render(this.#infoView,this.#mainElement,RenderPosition.AFTERBEGIN);
+    }else{
+      replace(this.#infoView, previousInfoComponent);
+      remove(previousInfoComponent);
+    }
+
   }
 
   #handleSortTypeChange = (sortType) => {
@@ -206,12 +218,52 @@ export default class TripPresenter {
   };
 
   #onResetNewEventClick = () => {
-    remove(this.#formCreateEvent);
+    this.#removeFormCreate();
+  };
+
+  #onSaveNewEventClick = (point) => {
+    this.#onDataChange(UserAction.ADD_EVENT, UpdateType.MINOR, point);
+    remove(this.#formCreateEvent);//временно
     this.#formCreateEvent = null;
   };
 
-  #onSaveNewEventClick = () => {
-    remove(this.#formCreateEvent);//временно
-    this.#formCreateEvent = null;
+  //событие добавление/изменение/удаление точки маршрута
+  #onDataChange = (actionType, updateType, newPoint) => {
+    switch (actionType) {
+      case UserAction.ADD_EVENT:
+        this.#pointsModel.addPoint(updateType, newPoint);
+        break;
+      case UserAction.UPDATE_EVENT:
+        this.#pointsModel.updatePoint(updateType, newPoint);
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#pointsModel.deletePoint(updateType, newPoint);
+        break;
+    }
+  };
+
+  //очистить все точки маршрута и их презентеры
+  #clearWayPoints() {
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
+  }
+
+  //обновить представления списка точек маршрута в случае изменения модели данных
+  #handleModelChange = (updateType, id) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#pointPresenters.get(id).init(this.#pointsModel.getPointDataById(id));
+        break;
+      case UpdateType.MINOR:
+        this.#clearWayPoints();
+        this.#renderAPP();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearWayPoints();
+        this.#currentSortType = SortType.DAY;
+        this.init();
+        break;
+    }
+
   };
 }

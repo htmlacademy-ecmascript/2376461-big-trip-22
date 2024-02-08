@@ -14,9 +14,9 @@ const BLANK_CREATE_POINT = {
   id: '0',
   type: 'taxi',
   destination: '',
-  timeDateStart: new Date().toString(),//день/месяц/год часы:минуты  flatpicker: d/m/Y h:i
-  timeDateEnd: new Date().toString(),
-  price: 0,
+  timeDateStart: '',//день/месяц/год часы:минуты  flatpicker: d/m/Y h:i
+  timeDateEnd: '',
+  price: '',
   isFavorite: false,
   offers: [],
 };
@@ -56,4 +56,27 @@ const SortType = {
   OFFERS: 'offers'
 };
 
-export { BLANK_CREATE_POINT, POINTS_TYPE, FiltersType, CLEAR_BOARD_TEXT , Mode, SortType, CONFIG_DATE_PICKER };
+const UserAction = {
+  UPDATE_EVENT: 'UPDATE_EVENT',
+  ADD_EVENT: 'ADD_EVENT',
+  DELETE_EVENT: 'DELETE_EVENT',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+export {
+  BLANK_CREATE_POINT,
+  DateFormat,
+  POINTS_TYPE,
+  FiltersType,
+  CLEAR_BOARD_TEXT ,
+  Mode,
+  SortType,
+  CONFIG_DATE_PICKER,
+  UserAction,
+  UpdateType };
