@@ -66,7 +66,7 @@ export default class PointsModel extends Observable {
 
       this._notify(updateType, updatedEvent);
     } catch(err) {
-      throw new Error('Can\'t update event' + err);
+      throw new Error('Can\'t update event');
     }
   }
 
@@ -87,7 +87,7 @@ export default class PointsModel extends Observable {
       ];
       this._notify(updateType, newEvent);
     } catch(err) {
-      throw new Error('Can\'t add event' + err);
+      throw new Error('Can\'t add event');
     }
   }
 
