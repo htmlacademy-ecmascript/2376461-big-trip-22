@@ -128,8 +128,8 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
     ${createOffersSection(currentOffers)}
 
     ${createDestinationSection(destination)}
-    </section>
-  </form>`
+    </form>
+    </section>`
   );
 }
 
