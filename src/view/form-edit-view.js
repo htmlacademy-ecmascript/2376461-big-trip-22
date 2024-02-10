@@ -280,7 +280,7 @@ export default class EditView extends AbstractStatefulView{
   //установить дату и время начала точки маршрута
   #setDatePickerFrom() {
     this.#datePickerFrom = flatpickr(
-      this.element.querySelector('.event__input--time[name="event-start-time"]'),
+      this.element.querySelector('#event-start-time-1'),
       {
         ...CONFIG_DATE_PICKER,
         defaultDate: this._state.timeDateEnd,
@@ -293,14 +293,14 @@ export default class EditView extends AbstractStatefulView{
   //событие изменение даты и время начала точки маршрута
   #dateFromChangeHandler = ([userDate]) => {
     this.updateElement({
-      dateFrom: userDate.toISOString(),
+      timeDateStart: userDate.toISOString(),
     });
   };
 
   //установить дату и время окончания точки маршрута
   #setDatePickerTo() {
     this.#datePickerTo = flatpickr(
-      this.element.querySelector('.event__input--time[name="event-end-time"]'),
+      this.element.querySelector('#event-end-time-1'),
       {
         ...CONFIG_DATE_PICKER,
         defaultDate: this._state.timeDateEnd,
@@ -313,7 +313,7 @@ export default class EditView extends AbstractStatefulView{
   //событие изменение даты и время окончания точки маршрута
   #dateToChangeHandler = ([userDate]) => {
     this.updateElement({
-      dateTo: userDate.toISOString(),
+      timeDateEnd: userDate.toISOString(),
     });
   };
 }
