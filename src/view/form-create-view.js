@@ -193,6 +193,14 @@ export default class FormCeateView extends AbstractStatefulView{
     this.updateElement({point: newPoint});
   };
 
+
+  parseStateToServer(state) {
+    delete state.isDeleting;
+    delete state.isSaving;
+
+    return state;
+  }
+
   //установить новый пункт назначения
   setNewDestination = (newDestination) => {
     const newPoint = {...this._state.point};
@@ -258,7 +266,7 @@ export default class FormCeateView extends AbstractStatefulView{
     if(this._state.destination === '' || this._state.price === 0){
       return;
     }
-    this.#onSaveClick(this._state);
+    this.#onSaveClick(this.parseStateToServer(this._state));
   };
 
   #buttonResetClickHandler = (evt) => {
