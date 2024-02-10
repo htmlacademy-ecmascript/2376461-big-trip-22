@@ -1,4 +1,5 @@
 const DateFormat = {
+  DAY: 'D',
   DAY_MONTH: 'D MMM',
   MONTH_DAY: 'MMM DD',
   TIME: 'HH:mm',

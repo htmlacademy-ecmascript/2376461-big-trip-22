@@ -10,7 +10,7 @@ const filtersElement = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 const tripMainElement = document.querySelector('.trip-main');
 
-const AUTHORIZATION = 'Basic minecraft0is0reallife';
+const AUTHORIZATION = 'Basic thatwassohardforme1111';
 const END_POINT = 'https://22.objects.htmlacademy.pro/big-trip';
 
 const pointsModel = new PointsModel({ tripApiService: new TripApiService(END_POINT, AUTHORIZATION) });
