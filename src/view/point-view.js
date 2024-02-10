@@ -1,4 +1,4 @@
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { UserAction, UpdateType } from '../constants.js';
 import { typeNameNormalize, getItemById,getOffersByType } from '../utils/common.js';
 import dayjs from 'dayjs';
@@ -54,7 +54,7 @@ function createPointTemplate(pointData,offers,destination) {
   );
 }
 
-export default class PointView extends AbstractView{
+export default class PointView extends AbstractStatefulView{
   #point = null;
   #offers = null;
   #destination = null;
@@ -66,19 +66,24 @@ export default class PointView extends AbstractView{
     super();
 
     this.#point = point;
+
     this.#offers = offers;
     this.#destination = getItemById(this.#point.destination,destinations);
 
     this.#onEditClick = onEditClick;
     this.#onFavoriteClick = onFavoriteClick;
 
-    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#editClickHandler);
-    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
+    this._restoreHandlers();
   }
 
 
   get template() {
     return createPointTemplate(this.#point,getOffersByType(this.#offers,this.#point.type),this.#destination);
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__rollup-btn').addEventListener('click',this.#editClickHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
 
   #editClickHandler = (evt) => {
