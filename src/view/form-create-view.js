@@ -127,7 +127,7 @@ function createFormCeateTemplate(point,offers,destinations,destinationNames) {
           <input type="number" class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit">${point.isSaving ? 'Saving...' : 'Save'}</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
 
@@ -157,7 +157,11 @@ export default class FormCeateView extends AbstractStatefulView{
   constructor ({ point, offers, destinations, onTypeChange, onDestinationChange, onResetClick, onSaveClick}) {
     super();
 
-    this._setState(point);
+    this._setState({
+      ...point,
+      isDeleting: false,
+      isSaving: false
+    });
 
     this.#onTypeChange = onTypeChange;
     this.#onDestinationChange = onDestinationChange;
@@ -298,4 +302,21 @@ export default class FormCeateView extends AbstractStatefulView{
   #dateToChangeHandler = ([userDate]) => {
     this._state.timeDateEnd = userDate.toISOString();
   };
+
+  setSaving() {
+    this.updateElement({
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.updateElement({
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.shake(resetFormState);
+  }
 }
