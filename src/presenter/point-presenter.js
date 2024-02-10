@@ -104,6 +104,38 @@ export default class PointPresenter {
     remove(this.#editPointComponent);
   }
 
+  setSaving() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isSaving: true,
+      });
+    }
+  }
+
+  setDeleting() {
+    if (this.#mode === Mode.EDITING) {
+      this.#editPointComponent.updateElement({
+        isDeleting: true,
+      });
+    }
+  }
+
+  setAborting() {
+    if (this.#mode === Mode.DEFAULT) {
+      this.#pointComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#editPointComponent.updateElement({
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#editPointComponent.shake(resetFormState);
+  }
+
   //событие клик по кнопке избранное
   #onFavoriteClick = (actionType, updateType) => {
     const newPoint = {...this.#point};
@@ -112,9 +144,8 @@ export default class PointPresenter {
   };
 
   #onEditSubmit = (actionType, updateType, point) => {
-    this.#onDataChange(actionType, updateType, point);
-    this.#replaceFormToPoint();
     document.removeEventListener('keydown',this.#escKeyDownHandler);
+    this.#onDataChange(actionType, updateType, point);
   };
 
   #onEditClick = () => {
