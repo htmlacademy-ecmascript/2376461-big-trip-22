@@ -7,7 +7,7 @@ import ListEmpty from '../view/list-empty.js';
 import { filter } from '../utils/filter.js';
 import PointPresenter from './point-presenter.js';
 import { SortType } from '../constants.js';
-import { sortDate, sortPrice, sortTime } from '../utils/date.js';
+import { sortByDate, sortPrice, sortTime } from '../utils/date.js';
 import NewEventButton from '../view/new-event-button.js';
 import FormCeateView from '../view/form-create-view.js';
 import InfoView from '../view/info-view.js';
@@ -74,8 +74,8 @@ export default class TripPresenter {
 
     render(this.#tripList,this.#tripContainer);
 
-    this.#pointsForRender.sort(sortDate);//сортирую по дате начала событий
-    this.#pointsData.sort(sortDate);//сортирую по дате начала событий
+    this.#pointsForRender.sort(sortByDate);//сортирую по дате начала событий
+    this.#pointsData.sort(sortByDate);//сортирую по дате начала событий
 
     this.#renderNewEventButton();
     this.#renderAPP();
@@ -124,7 +124,7 @@ export default class TripPresenter {
   #sortPointsData(){
     switch(this.#currentSortType){
       case SortType.DAY:
-        this.#pointsForRender.sort(sortDate);
+        this.#pointsForRender.sort(sortByDate);
         break;
       case SortType.PRICE:
         this.#pointsForRender.sort(sortPrice);
@@ -133,7 +133,7 @@ export default class TripPresenter {
         this.#pointsForRender.sort(sortTime);
         break;
       default:
-        this.#pointsForRender.sort(sortDate);
+        this.#pointsForRender.sort(sortByDate);
         break;
     }
   }
@@ -211,7 +211,7 @@ export default class TripPresenter {
   #renderInfoWiev(){
     const previousInfoComponent = this.#infoView;
 
-    this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers});//Info wiev
+    this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers,destinations: this.#destinations});//Info wiev
 
     if (previousInfoComponent === null) {
       render(this.#infoView,this.#mainElement,RenderPosition.AFTERBEGIN);
