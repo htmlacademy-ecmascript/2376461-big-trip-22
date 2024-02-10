@@ -171,7 +171,6 @@ export default class PointPresenter {
 
   //событие клик по кнопке удаления формы редактирования точки маршрута
   #onButtonDeleteClick = (point) => {
-    this.#replaceFormToPoint();
     this.#onDataChange(UserAction.DELETE_EVENT, UpdateType.MINOR, point);
   };
 }
