@@ -11,7 +11,13 @@ import { sortDate, sortPrice, sortTime } from '../utils/date.js';
 import NewEventButton from '../view/new-event-button.js';
 import FormCeateView from '../view/form-create-view.js';
 import InfoView from '../view/info-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker';
+import FailedTripView from '../view/failed-trip-view.js';
 
+const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 export default class TripPresenter {
   #filterModel = null;
   #tripContainer = null;
@@ -29,6 +35,12 @@ export default class TripPresenter {
 
   #sortComponent = null;
   #currentSortType = SortType.DAY;
+
+  #failedTripComponent = new FailedTripView();
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT
+  });
 
   #infoView = null;
 
@@ -237,35 +249,40 @@ export default class TripPresenter {
 
   #onSaveNewEventClick = (point) => {
     this.#onDataChange(UserAction.ADD_EVENT, UpdateType.MINOR, point);
-    remove(this.#formCreateEvent);//временно
-    this.#formCreateEvent = null;
   };
 
   //событие добавление/изменение/удаление точки маршрута
   #onDataChange = async (actionType, updateType, newPoint) => {
+    this.#uiBlocker.block();
+
     switch (actionType) {
       case UserAction.ADD_EVENT:
+        this.#formCreateEvent.setSaving();
         try {
           await this.#pointsModel.addEvent(updateType, newPoint);
         } catch (error) {
-          console.log(error);
+          this.#formCreateEvent.setAborting();
         }
         break;
       case UserAction.UPDATE_EVENT:
+        this.#pointPresenters.get(newPoint.id).setSaving();
         try {
           await this.#pointsModel.updateEvent(updateType, newPoint);
         } catch (error) {
-          console.log(error);
+          this.#pointPresenters.get(newPoint.id).setAborting();
         }
         break;
       case UserAction.DELETE_EVENT:
+        this.#pointPresenters.get(newPoint.id).setDeleting();
         try {
           await this.#pointsModel.deleteEvent(updateType, newPoint);
         } catch (error) {
-          console.log(error);
+          this.#pointPresenters.get(newPoint.id).setAborting();
         }
         break;
     }
+    this.#uiBlocker.unblock();
+
   };
 
   //очистить все точки маршрута и их презентеры
@@ -300,10 +317,14 @@ export default class TripPresenter {
       case UpdateType.ERROR:
         this.#isLoading = false;
         this.#newEventButtonComponent.updateElement({disabled: true});
-        //this.#renderFailedState();
+        this.#renderFailedState();
         this.#clearWayPoints();
         break;
     }
 
   };
+
+  #renderFailedState() {
+    render(this.#failedTripComponent, this.#tripContainer);
+  }
 }

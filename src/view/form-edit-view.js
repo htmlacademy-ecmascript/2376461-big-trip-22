@@ -119,8 +119,8 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
         <input type="number" class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${point.price}">
       </div>
 
-      <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Delete</button>
+      <button class="event__save-btn  btn  btn--blue" type="submit">${point.isSaving ? 'Saving...' : 'Save'}</button>
+      <button class="event__reset-btn" type="reset">${point.isDeleting ? 'Deleting...' : 'Delete'}</button>
       <button class="event__rollup-btn" type="button">
         <span class="visually-hidden">Open event</span>
       </button>
@@ -150,7 +150,11 @@ export default class EditView extends AbstractStatefulView{
 
   constructor ({ point, offers, destinations, onTypeChange, onDestinationChange , onEditSubmit, onDelete, onCloseEdit}) {
     super();
-    this._setState(point);
+    this._setState({
+      ...point,
+      isDeleting: false,
+      isSaving: false
+    });
 
     this.#onTypeChange = onTypeChange;
     this.#onDestinationChange = onDestinationChange;
@@ -168,7 +172,7 @@ export default class EditView extends AbstractStatefulView{
   }
 
   get template() {
-    return createEditTemplate(this._state, this.#offers,this.#destinations,this.#destitationNameList);
+    return createEditTemplate(this._state, this.#offers,this.#destinations,this.#destitationNameList,);
   }
 
   resetState() {
@@ -226,7 +230,7 @@ export default class EditView extends AbstractStatefulView{
 
   #editSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleEditSubmit(UserAction.UPDATE_EVENT, UpdateType.PATCH,this._state);
+    this.#handleEditSubmit(UserAction.UPDATE_EVENT, UpdateType.MINOR,this.parseStateToEvent(this._state));
   };
 
   #rollUpClickHandler = (evt) => {
@@ -236,8 +240,15 @@ export default class EditView extends AbstractStatefulView{
 
   #buttonDeleteClickHandler = (evt) => {
     evt.preventDefault();
-    this.#handleDeleteClick(this._state);
+    this.#handleDeleteClick(this.parseStateToEvent(this._state));
   };
+
+  parseStateToEvent(state) {
+    delete state.isDeleting;
+    delete state.isSaving;
+
+    return state;
+  }
 
   #pointTypeChangeHandler = (evt) => {
     evt.preventDefault();
