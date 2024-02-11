@@ -95,6 +95,8 @@ export default class TripPresenter {
     if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
       this.#renderEmpty();
       return;
+    }else if(this.#listEmpty !== null){
+      remove(this.#listEmpty);
     }
 
     this.#renderInfoWiev();
@@ -103,6 +105,8 @@ export default class TripPresenter {
     this.#filterPointsData(this.#filterModel.filter);
     this.#sortPointsData();
 
+    this.#removeFormCreate();
+
     for(let i = 0; i < this.#pointsForRender.length; i++){
       this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
     }
@@ -110,6 +114,10 @@ export default class TripPresenter {
 
   //отрисовывает заглушку, когда точки пусты
   #renderEmpty(){
+    if(this.#listEmpty !== null){
+      return;
+    }
+
     this.#listEmpty = new ListEmpty();
     this.#listEmpty.setSortType(this.#filter);
     render(this.#listEmpty,this.#tripList.element);
@@ -165,6 +173,8 @@ export default class TripPresenter {
     if(this.#formCreateEvent !== null){
       return;
     }
+    this.#newEventButtonComponent.updateElement({disabled: true});
+    document.addEventListener('keydown', this.#escKeyDownHandler);
 
     this.#formCreateEvent = new FormCeateView({
       point: BLANK_CREATE_POINT,
@@ -185,8 +195,17 @@ export default class TripPresenter {
     this.#resetAllPresenters();
   };
 
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      this.#onResetNewEventClick();
+    }
+  };
+
   //удалить форму создания
   #removeFormCreate(){
+    this.#newEventButtonComponent.updateElement({disabled: false});
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
     remove(this.#formCreateEvent);
     this.#formCreateEvent = null;
   }
@@ -199,7 +218,6 @@ export default class TripPresenter {
   #renderSortWiev(){
     const previousSortComponent = this.#sortComponent;
     this.#sortComponent = new SortView({currentSortType: this.#currentSortType, onSortTypeChange: this.#handleSortTypeChange});
-
     if(previousSortComponent === null){
       render(this.#sortComponent,this.#tripContainer,RenderPosition.AFTERBEGIN);
     }else{
@@ -248,7 +266,7 @@ export default class TripPresenter {
   };
 
   #onSaveNewEventClick = (point) => {
-    this.#onDataChange(UserAction.ADD_EVENT, UpdateType.MINOR, point);
+    this.#onDataChange(UserAction.ADD_EVENT, UpdateType.MAJOR, point);
   };
 
   //событие добавление/изменение/удаление точки маршрута
@@ -260,6 +278,7 @@ export default class TripPresenter {
         this.#formCreateEvent.setSaving();
         try {
           await this.#pointsModel.addEvent(updateType, newPoint);
+          this.#newEventButtonComponent.updateElement({disabled: false});
         } catch (error) {
           this.#formCreateEvent.setAborting();
         }

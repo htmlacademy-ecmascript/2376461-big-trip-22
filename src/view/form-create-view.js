@@ -102,11 +102,11 @@ function createFormCeateTemplate(point,offers,destinations,destinationNames) {
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">
+          <label class="event__label  event__type-output" for="event-create">
           ${typeNameNormalize(point.type)}
           </label>
-          <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${getDestinationName()}" list="destination-list-1">
-          <datalist id="destination-list-1">
+          <input class="event__input  event__input--destination" id="event-create" type="text" name="event-create" value="${getDestinationName()}" list="destination-list-create">
+          <datalist id="destination-list-create">
             ${createDestinationOptionList(destinationNames)}
           </datalist>
         </div>
@@ -172,7 +172,7 @@ export default class FormCeateView extends AbstractStatefulView{
     this.#offers = offers;
     this.#destinations = destinations;
     this.#destitationNameList = getAllKeyValue('name',destinations);
-
+    this.setNewType('taxi');
     this._restoreHandlers();
   }
 
@@ -186,12 +186,20 @@ export default class FormCeateView extends AbstractStatefulView{
 
   //установить новый тип точки маршрута
   setNewType = (newType) => {
-    const newPoint = {...this._state.point};
+    const newPoint = {...this._state};
     newPoint.type = newType.toLowerCase();
     this._state.offers = [];
 
     this.updateElement({point: newPoint});
   };
+
+
+  parseStateToServer(state) {
+    delete state.isDeleting;
+    delete state.isSaving;
+
+    return state;
+  }
 
   //установить новый пункт назначения
   setNewDestination = (newDestination) => {
@@ -256,9 +264,10 @@ export default class FormCeateView extends AbstractStatefulView{
   #saveClickHandler = (evt) => {
     evt.preventDefault();
     if(this._state.destination === '' || this._state.price === 0){
+      this.shake();
       return;
     }
-    this.#onSaveClick(this._state);
+    this.#onSaveClick(this.parseStateToServer(this._state));
   };
 
   #buttonResetClickHandler = (evt) => {
@@ -273,8 +282,8 @@ export default class FormCeateView extends AbstractStatefulView{
       this.element.querySelector('.event__input--time[name="event-start-time"]'),
       {
         ...CONFIG_DATE_PICKER,
-        defaultDate: this._state.timeDateEnd,//this._state.dateFrom
-        maxDate: this._state.timeDateStart,//this._state.dateTo
+        defaultDate: this._state.timeDateEnd,
+        maxDate: this._state.timeDateStart,
         onChange: this.#dateFromChangeHandler,
       },
     );
