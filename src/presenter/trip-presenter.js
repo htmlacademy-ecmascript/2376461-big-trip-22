@@ -75,7 +75,7 @@ export default class TripPresenter {
     render(this.#tripList,this.#tripContainer);
 
     this.#pointsForRender.sort(sortByDate);//сортирую по дате начала событий
-    this.#pointsData.sort(sortByDate);//сортирую по дате начала событий
+    //this.#pointsData.sort(sortByDate);//сортирую по дате начала событий
 
     this.#renderNewEventButton();
     this.#renderAPP();
@@ -83,7 +83,6 @@ export default class TripPresenter {
 
   //основная функция рендер для отрисовки поинтов в борде
   #renderAPP (){
-
     if (this.#isLoading) {
       render(this.#loadingTripComponent, this.#tripContainer);
       return;
@@ -91,7 +90,7 @@ export default class TripPresenter {
 
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-
+    this.#renderInfoWiev();
     if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
       this.#renderEmpty();
       return;
@@ -99,7 +98,7 @@ export default class TripPresenter {
       remove(this.#listEmpty);
     }
 
-    this.#renderInfoWiev();
+
     this.#renderSortWiev();
 
     this.#filterPointsData(this.#filterModel.filter);
@@ -117,6 +116,8 @@ export default class TripPresenter {
     if(this.#listEmpty !== null){
       return;
     }
+    remove(this.#sortComponent);
+    this.#sortComponent = null;
 
     this.#listEmpty = new ListEmpty();
     this.#listEmpty.setSortType(this.#filter);
@@ -173,6 +174,10 @@ export default class TripPresenter {
     if(this.#formCreateEvent !== null){
       return;
     }
+
+    this.#resetAllPresenters();
+    this.#filterModel.setFilter(UpdateType.MAJOR, FiltersType.everything);
+
     this.#newEventButtonComponent.updateElement({disabled: true});
     document.addEventListener('keydown', this.#escKeyDownHandler);
 
@@ -185,8 +190,12 @@ export default class TripPresenter {
       onResetClick: this.#onResetNewEventClick,
       onSaveClick: this.#onSaveNewEventClick
     });
-    this.#resetAllPresenters();
     render(this.#formCreateEvent,this.#tripList.element,RenderPosition.AFTERBEGIN);
+
+    if(this.#listEmpty !== null){
+      remove(this.#listEmpty);
+      this.#listEmpty = null;
+    }
   };
 
   //Реакция на смену Mode
@@ -227,6 +236,12 @@ export default class TripPresenter {
   }
 
   #renderInfoWiev(){
+    if(this.#pointsData.length === 0){
+      remove(this.#infoView);
+      this.#infoView = null;
+      return;
+    }
+
     const previousInfoComponent = this.#infoView;
 
     this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers,destinations: this.#destinations});//Info wiev
@@ -263,6 +278,9 @@ export default class TripPresenter {
 
   #onResetNewEventClick = () => {
     this.#removeFormCreate();
+    if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
+      this.#renderEmpty();
+    }
   };
 
   #onSaveNewEventClick = (point) => {
