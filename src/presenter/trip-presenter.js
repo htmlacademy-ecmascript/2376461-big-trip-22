@@ -83,33 +83,36 @@ export default class TripPresenter {
 
   //основная функция рендер для отрисовки поинтов в борде
   #renderAPP (){
-
+    console.log('1');
     if (this.#isLoading) {
       render(this.#loadingTripComponent, this.#tripContainer);
       return;
     }
-
+    console.log('2');
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-
+    console.log('3');
     if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
       this.#renderEmpty();
+      console.log('#renderEmpty');
       return;
     }else if(this.#listEmpty !== null){
+      console.log('remove #renderEmpty');
       remove(this.#listEmpty);
     }
-
+    console.log('4');
     this.#renderInfoWiev();
     this.#renderSortWiev();
-
+    console.log('5');
     this.#filterPointsData(this.#filterModel.filter);
     this.#sortPointsData();
-
+    console.log('6');
     this.#removeFormCreate();
-
+    console.log('7');
     for(let i = 0; i < this.#pointsForRender.length; i++){
       this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
     }
+    console.log('8');
   }
 
   //отрисовывает заглушку, когда точки пусты
@@ -117,6 +120,8 @@ export default class TripPresenter {
     if(this.#listEmpty !== null){
       return;
     }
+    remove(this.#sortComponent);
+    this.#sortComponent = null;
 
     this.#listEmpty = new ListEmpty();
     this.#listEmpty.setSortType(this.#filter);
@@ -173,6 +178,7 @@ export default class TripPresenter {
     if(this.#formCreateEvent !== null){
       return;
     }
+
     this.#resetAllPresenters();
     this.#filterModel.setFilter(UpdateType.MAJOR, FiltersType.everything);
 
@@ -190,6 +196,10 @@ export default class TripPresenter {
     });
     render(this.#formCreateEvent,this.#tripList.element,RenderPosition.AFTERBEGIN);
 
+    if(this.#listEmpty !== null){
+      remove(this.#listEmpty);
+      this.#listEmpty = null;
+    }
   };
 
   //Реакция на смену Mode
@@ -269,6 +279,9 @@ export default class TripPresenter {
 
   #onResetNewEventClick = () => {
     this.#removeFormCreate();
+    if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
+      this.#renderEmpty();
+    }
   };
 
   #onSaveNewEventClick = (point) => {
