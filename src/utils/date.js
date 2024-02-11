@@ -60,7 +60,9 @@ function differenceMinutes(startTime, endTime) {
   return start.diff(end, 'minute');
 }
 //sort по дате
-const sortByDate = (firstPoint, secondPoint) => dayjs(secondPoint.timeDateStart) - dayjs(firstPoint.timeDateStart);
+function sortByDate(eventA, eventB) {
+  return dayjs(eventA.timeDateStart).diff(eventB.timeDateStart);
+}
 //sort по цене
 const sortPrice = (a, b) => b.price - a.price;
 //sort по времени
