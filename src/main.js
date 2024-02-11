@@ -28,3 +28,4 @@ const tripPresenter = new TripPresenter({
 pointsModel.init();
 filterPresenter.init();
 tripPresenter.init();
+//удачи
