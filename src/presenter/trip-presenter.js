@@ -173,6 +173,9 @@ export default class TripPresenter {
     if(this.#formCreateEvent !== null){
       return;
     }
+    this.#resetAllPresenters();
+    this.#filterModel.setFilter(UpdateType.MAJOR, FiltersType.everything);
+
     this.#newEventButtonComponent.updateElement({disabled: true});
     document.addEventListener('keydown', this.#escKeyDownHandler);
 
@@ -185,8 +188,8 @@ export default class TripPresenter {
       onResetClick: this.#onResetNewEventClick,
       onSaveClick: this.#onSaveNewEventClick
     });
-    this.#resetAllPresenters();
     render(this.#formCreateEvent,this.#tripList.element,RenderPosition.AFTERBEGIN);
+
   };
 
   //Реакция на смену Mode
@@ -227,6 +230,9 @@ export default class TripPresenter {
   }
 
   #renderInfoWiev(){
+    if(this.#pointsData.length === 0){
+      return;
+    }
     const previousInfoComponent = this.#infoView;
 
     this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers,destinations: this.#destinations});//Info wiev

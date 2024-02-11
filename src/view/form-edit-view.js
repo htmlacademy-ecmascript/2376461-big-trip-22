@@ -20,17 +20,28 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
     if(destinationObject.description === '' && destinationObject.pictures.length === 0){
       return '';
     }
+
     const showPhotos = () => destinationObject.pictures.map((item) => `<img class="event__photo" src="${item.src}" alt="${item.description}">`).join('');
+    const createPhotoContainer = (picturesCount) =>{
 
-    return (`<section class="event__section  event__section--destination">
-    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${destinationObject.description}</p>
+      if(picturesCount === 0){
+        return '';
+      }
 
-    <div class="event__photos-container">
+      return `<div class="event__photos-container">
       <div class="event__photos-tape">
       ${showPhotos()}
       </div>
-    </div>
+    </div>`;
+
+    };
+
+    return (`
+    <section class="event__section  event__section--destination">
+    <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+    <p class="event__destination-description">${destinationObject.description}</p>
+
+    ${createPhotoContainer(destinationObject.pictures.length)}
   </section>`);
   };
 
@@ -75,7 +86,8 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
   };
 
   return (
-    `<form class="event event--edit" action="#" method="post">
+    `<li class="trip-events__item">
+    <form class="event event--edit" action="#" method="post">
     <header class="event__header">
       <div class="event__type-wrapper">
         <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -96,7 +108,8 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
         <label class="event__label  event__type-output" for="event-destination-1">
         ${typeNameNormalize(point.type)}
         </label>
-        <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
+        <input class="event__input  event__input--destination" id="event-destination-1" type="text"
+            name="event-destination" value="${destination.name}" list="destination-list-1">
         <datalist id="destination-list-1">
           ${createDestinationOptionList(destinationNames)}
         </datalist>
@@ -128,7 +141,7 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
 
     ${createDestinationSection(destination)}
     </form>
-    </section>`
+    </li>`
   );
 }
 
