@@ -1,4 +1,3 @@
-import { updateItem } from '../utils/common.js';
 import Observable from '../framework/observable.js';
 import { UpdateType } from '../constants.js';
 
@@ -126,24 +125,6 @@ export default class PointsModel extends Observable {
   getPointDataById(id) {
     const point = this.#points.find((item) => item.id === id);
     return point;
-  }
-
-  //обновить точку маршрута
-  updatePoint(updateType, updatedPoint) {
-    this.#points = updateItem(this.#points, updatedPoint);
-    this._notify(updateType, updatedPoint.id);
-  }
-
-  //добавить точку маршрута
-  addPoint(updateType, newPoint) {
-    this.#points.push(newPoint);
-    this._notify(updateType);
-  }
-
-  //удалить точку маршрута
-  deletePoint(updateType, point) {
-    this.#points = this.#points.filter((item) => item.id !== point.id);
-    this._notify(updateType);
   }
 
 }

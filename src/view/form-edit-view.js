@@ -66,7 +66,6 @@ function createEditTemplate(point,offers,destinations,destinationNames) {
   const createPointTypeTemplate = (item) => {
     const itemLower = item.toLowerCase();
     const isChecked = (itemLower === point.type) ? 'checked' : '';
-
     return (
       `<div class="event__type-item">
       <input id="event-type-${itemLower}-${point.id}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${item}" ${isChecked}>
