@@ -75,7 +75,7 @@ export default class TripPresenter {
     render(this.#tripList,this.#tripContainer);
 
     this.#pointsForRender.sort(sortByDate);//сортирую по дате начала событий
-    this.#pointsData.sort(sortByDate);//сортирую по дате начала событий
+    //this.#pointsData.sort(sortByDate);//сортирую по дате начала событий
 
     this.#renderNewEventButton();
     this.#renderAPP();
@@ -83,36 +83,32 @@ export default class TripPresenter {
 
   //основная функция рендер для отрисовки поинтов в борде
   #renderAPP (){
-    console.log('1');
     if (this.#isLoading) {
       render(this.#loadingTripComponent, this.#tripContainer);
       return;
     }
-    console.log('2');
+
     this.#pointsData = [...this.#pointsModel.wayPoints];
     this.#destinations = this.#pointsModel.destinations;
-    console.log('3');
+    this.#renderInfoWiev();
     if(this.#pointsData.length === 0 || this.#filterPointsData === 0){
       this.#renderEmpty();
-      console.log('#renderEmpty');
       return;
     }else if(this.#listEmpty !== null){
-      console.log('remove #renderEmpty');
       remove(this.#listEmpty);
     }
-    console.log('4');
-    this.#renderInfoWiev();
+
+
     this.#renderSortWiev();
-    console.log('5');
+
     this.#filterPointsData(this.#filterModel.filter);
     this.#sortPointsData();
-    console.log('6');
+
     this.#removeFormCreate();
-    console.log('7');
+
     for(let i = 0; i < this.#pointsForRender.length; i++){
       this.#renderWayPoint(this.#pointsForRender[i],this.#tripList.element);
     }
-    console.log('8');
   }
 
   //отрисовывает заглушку, когда точки пусты
@@ -241,8 +237,11 @@ export default class TripPresenter {
 
   #renderInfoWiev(){
     if(this.#pointsData.length === 0){
+      remove(this.#infoView);
+      this.#infoView = null;
       return;
     }
+
     const previousInfoComponent = this.#infoView;
 
     this.#infoView = new InfoView({points:this.#pointsData,offers: this.#pointsModel.offers,destinations: this.#destinations});//Info wiev
